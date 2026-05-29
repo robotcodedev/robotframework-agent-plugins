@@ -6,9 +6,6 @@
 		"email": "dbiehl@live.de",
 		"url": "https://robotcode.io"
 	},
-	"metadata": {
-		"pluginRoot": "./plugins"
-	},
 	"plugins": [
 		{
 			"name": "robotcode",
