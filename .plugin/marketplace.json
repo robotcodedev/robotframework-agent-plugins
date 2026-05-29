@@ -1,0 +1,27 @@
+{
+	"name": "robotframework-agent-plugins",
+	"description": "Curated agent plugins for Robot Framework — Skills, hooks, and tools that extend AI coding agents with Robot Framework expertise.",
+	"owner": {
+		"name": "RobotCode",
+		"email": "dbiehl@live.de",
+		"url": "https://robotcode.io"
+	},
+	"metadata": {
+		"pluginRoot": "./plugins"
+	},
+	"plugins": [
+		{
+			"name": "robotcode",
+			"source": "./plugins/robotcode/",
+			"description": "RobotCode CLI plugin for Robot Framework library, resource, keyword, project, and result workflows",
+			"keywords": [
+				"robotframework",
+				"robotcode",
+				"testing",
+				"test-automation",
+				"cli",
+				"test"
+			]
+		}
+	]
+}
