@@ -1,6 +1,6 @@
 # robotframework-agent-plugins
 
-A curated [Open Plugins](https://open-plugins.com/) marketplace for Robot Framework — Skills, hooks, and tools that extend AI coding agents (Claude Code, GitHub Copilot, Cursor, Codex, OpenCode, …) with Robot Framework expertise.
+A curated [Open Plugins](https://open-plugins.com/) marketplace for Robot Framework — Skills, hooks, and tools that extend AI coding agents (Claude Code, GitHub Copilot, Codex, OpenCode, …) with Robot Framework expertise.
 
 ## Plugins in this marketplace
 
@@ -51,16 +51,6 @@ Then install plugins from the Extensions view's *Chat Plugins* section.
 
 > The [RobotCode VS Code extension](https://marketplace.visualstudio.com/items?itemName=d-biehl.robotcode) already ships the `robotcode` plugin built-in via `contributes.chatPlugins` — you only need this marketplace if you want to mix in future plugins from it.
 
-### Cursor
-
-Inside Cursor's chat input, run:
-
-```
-/add-plugin robotcodedev/robotframework-agent-plugins
-```
-
-Or browse the [Cursor Plugin Marketplace](https://cursor.com/marketplace) and add the repo URL. See [Cursor plugin docs](https://cursor.com/docs/plugins).
-
 ### Codex
 
 ```sh
@@ -92,7 +82,7 @@ plugins/
         └── references/
 ```
 
-Each plugin is its own directory under `plugins/` with an Open-Plugin-shaped `.plugin/` manifest. The marketplace manifest is mirrored at two paths because Claude Code only looks at `.claude-plugin/marketplace.json` and does not fall back to the vendor-neutral `.plugin/` location that other tools (Copilot CLI, Cursor, Codex) read.
+Each plugin is its own directory under `plugins/` with an Open-Plugin-shaped `.plugin/` manifest. The marketplace manifest is mirrored at two paths because Claude Code only looks at `.claude-plugin/marketplace.json` and does not fall back to the vendor-neutral `.plugin/` location that other tools (Copilot CLI, Codex) read.
 
 ## Contributing
 
