@@ -23,7 +23,7 @@ copilot plugin marketplace add robotcodedev/robotframework-agent-plugins
 copilot plugin install robotcode@robotframework-agent-plugins
 ```
 
-For Cursor, Codex, VS Code Copilot Chat, and other Open-Plugins-compliant agents, see the [marketplace README](../../README.md).
+For Codex, VS Code Copilot Chat, and other Open-Plugins-compliant agents, see the [marketplace README](../../README.md).
 
 > Using the [RobotCode VS Code extension](https://marketplace.visualstudio.com/items?itemName=d-biehl.robotcode)? It already bundles this plugin via `contributes.chatPlugins` — no separate install needed for VS Code Copilot Chat.
 
