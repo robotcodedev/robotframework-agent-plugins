@@ -30,9 +30,9 @@ CODEX_MARKETPLACE = REPO_ROOT / ".agents" / "plugins" / "marketplace.json"
 # the Codex listing has the right label; otherwise CODEX_DEFAULT_CATEGORY wins.
 CODEX_MARKETPLACE_DISPLAY_NAME = "Robot Framework Agent Plugins"
 CODEX_PLUGIN_CATEGORIES = {
-    "robotcode": "Development",
+    "robotcode": "Developer Tools",
 }
-CODEX_DEFAULT_CATEGORY = "Development"
+CODEX_DEFAULT_CATEGORY = "Developer Tools"
 CODEX_DEFAULT_POLICY = {
     "installation": "AVAILABLE",
     "authentication": "ON_INSTALL",
