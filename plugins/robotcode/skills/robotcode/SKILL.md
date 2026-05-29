@@ -19,7 +19,7 @@ Decide what the user actually wants *before* reaching for a command — these in
 - **Run tests** — *"run the tests", "execute the smoke suite".* `robotcode robot` (see *Running tests*), then summarize via `results`.
 - **Inspect a finished run** — *"what failed?", "did it pass?", "why did X fail?"* — `robotcode results` over the existing `output.xml`/`output.json`; no re-run needed (works on CI artifacts and a colleague's run too). See [references/results.md](references/results.md).
 - **Analyze / lint the code** — *"find issues", "are there unused keywords?", "check my robot code".* `robotcode analyze code` (static analysis: missing keywords, wrong args, unresolved variables).
-- **Inventory / understand the project** — *"what tests/tags/suites exist?", "how big is this?", "what's my effective config?"* — `robotcode discover` (tree without running) and `config` / `profiles`.
+- **Inventory / understand the project** — *"what tests/tags/suites exist?", "which tests have tag X?", "how big is this?", "what's my effective config?"* — `robotcode discover` (tree without running) and `config` / `profiles`. **Never read or grep `.robot` files to answer this** — see *Discovery* below for why a file scan gives the wrong answer.
 - **Look up a keyword or library** — *"what does X do?", "what args does it take?"* — `robotcode libdoc` (see *Documentation lookup priority* below).
 
 When a request is action-oriented or "watch me", default to the REPL over writing a file: promoting a working REPL session into a test later is cheap (`.save`), but a prematurely written test wastes effort, can't be watched, and tears its browser/connection down at the end of the run.
@@ -117,6 +117,14 @@ Use longname filters when you copied a full name from `discover` or `results sho
 ## Discovery — what's in the project?
 
 Use `robotcode discover` to inspect what the active profile would see without executing tests.
+
+**Do not answer "what tests / tags / suites exist?" by reading or grepping `.robot` files.** Which tests, tasks, suites, and tags actually exist is decided at *resolution time*, and a static file scan misses all of it:
+
+- **Robot's own rules** decide which files even become suites vs. resources vs. ignored, how directories nest into suites, and how `__init__.robot` and naming shape the tree.
+- **`robot.toml` / profiles** set the `paths` in scope, plus variables and name transforms that change suite and test names from what the file literally says.
+- **`-i/-e/-s/-t` filters and pre-run modifiers** add, remove, rename, or retag tests *before* execution — so a literal `[Tags]` line in a file is not necessarily the effective tag set, and a `*** Test Cases ***` entry may not survive into the run at all.
+
+`discover` performs that whole resolution with the project's installed Robot Framework and returns the real answer; grep cannot. (Same reasoning as preferring `libdoc` over reading library source.) When the user constrains by tag/suite/profile, pass the matching filters so the inventory reflects exactly that scope.
 
 | Goal | Command |
 | --- | --- |
@@ -242,3 +250,4 @@ For multi-step workflows, see [references/workflows.md](references/workflows.md)
 - `uvx` / `pipx` isolates RobotCode from the project and gives wrong answers for real projects.
 - `No profiles defined.` is an empty result, not an error.
 - REPL syntax is not `.robot` file syntax.
+- "What tests/tags/suites exist?" — and any "which tests have tag X / are in suite Y" question — is answered with `robotcode discover`, never by reading or grepping `.robot` files. The effective set is resolved at runtime (paths, config, profiles, variables, pre-run modifiers); static sources don't show it.

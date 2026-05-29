@@ -25,7 +25,7 @@ Don't pipe a huge enumeration through `grep` — that ingests it into your conte
 
 ## 2. Aggregate, don't enumerate
 
-If the user asks "how big is this project" / "what tags exist" / "is there a smoke suite", you don't need the test list:
+If the user asks "how big is this project" / "what tags exist" / "is there a smoke suite", you don't need the test list. Reach for an aggregating `discover` command — **not** a `grep` over `.robot` sources. At scale the urge to scan files is strongest, but it is both slow and wrong: the effective tests/tags/suites are resolved at runtime (paths, config, profiles, variables, pre-run modifiers), and `discover` is the only thing that reflects that (see *Discovery* in [SKILL.md](../SKILL.md)).
 
 ```bash
 # Counts only — last few lines of any discover command are a stats block
