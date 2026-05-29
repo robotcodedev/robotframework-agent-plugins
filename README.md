@@ -98,14 +98,17 @@ Plugins are reviewed for quality, accurate documentation, and license compatibil
 
 1. Add your plugin under `plugins/<your-plugin>/` with at minimum:
    - `.plugin/plugin.json` (Open Plugins spec manifest, `"license": "Apache-2.0"`).
-   - `.codex-plugin/plugin.json` — byte-identical copy of `.plugin/plugin.json` so Codex can install the plugin.
    - A skill, agent, hook, or MCP/LSP config — whatever the plugin provides.
    - A `README.md` describing what it does, prerequisites, and how the agent activates it.
    - A `LICENSE` file (Apache-2.0 — copy the one at the repo root) so the plugin stays self-contained when an agent caches it independently of this marketplace.
-2. Register the plugin in **all three** marketplace manifests:
-   - `.plugin/marketplace.json` and `.claude-plugin/marketplace.json` — Open Plugins schema, must stay byte-identical.
-   - `.agents/plugins/marketplace.json` — Codex schema (`source` object with `path`, `policy`, `category`, `interface.displayName`).
-3. Open a PR.
+2. Register the plugin once in the **source** marketplace catalog `.plugin/marketplace.json` (Open Plugins schema).
+3. If your plugin needs a Codex category other than the default, add it to `CODEX_PLUGIN_CATEGORIES` in [`scripts/sync_manifests.py`](scripts/sync_manifests.py).
+4. Run the manifest generator to populate the Claude and Codex copies:
+   ```sh
+   python scripts/sync_manifests.py
+   ```
+   This writes `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`, and each `plugins/<name>/.codex-plugin/plugin.json`. Run `python scripts/sync_manifests.py --check` in CI / before pushing to verify nothing drifted.
+5. Open a PR.
 
 ## License
 
