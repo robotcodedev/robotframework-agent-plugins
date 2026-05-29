@@ -86,7 +86,15 @@ Each plugin is its own directory under `plugins/` with an Open-Plugin-shaped `.p
 
 ## Contributing
 
-Plugins are reviewed for quality, accurate documentation, and a license compatible with Apache-2.0. Open a PR adding your plugin under `plugins/<your-plugin>/` and an entry to both `marketplace.json` files. Keep the two manifest copies in sync.
+Plugins are reviewed for quality, accurate documentation, and license compatibility with Apache-2.0. To submit a plugin:
+
+1. Add your plugin under `plugins/<your-plugin>/` with at minimum:
+   - `.plugin/plugin.json` (Open Plugins spec manifest, `"license": "Apache-2.0"`).
+   - A skill, agent, hook, or MCP/LSP config — whatever the plugin provides.
+   - A `README.md` describing what it does, prerequisites, and how the agent activates it.
+   - A `LICENSE` file (Apache-2.0 — copy the one at the repo root) so the plugin stays self-contained when an agent caches it independently of this marketplace.
+2. Register the plugin in **both** marketplace manifests — `.plugin/marketplace.json` and `.claude-plugin/marketplace.json`. The two files must stay byte-identical.
+3. Open a PR.
 
 ## License
 

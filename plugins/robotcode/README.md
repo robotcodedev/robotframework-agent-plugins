@@ -59,4 +59,4 @@ The marketplace [`robotcodedev/robotframework-agent-plugins`](https://github.com
 
 ## License
 
-Apache-2.0 — see the marketplace [LICENSE](../../LICENSE).
+Apache-2.0 — see [LICENSE](LICENSE).
