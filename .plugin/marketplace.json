@@ -10,7 +10,7 @@
 		{
 			"name": "robotcode",
 			"source": "./plugins/robotcode/",
-			"description": "RobotCode CLI plugin for Robot Framework library, resource, keyword, project, and result workflows",
+			"description": "Agent skill that teaches AI coding agents to drive robotcode properly in Robot Framework projects",
 			"keywords": [
 				"robotframework",
 				"robotcode",

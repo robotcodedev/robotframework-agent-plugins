@@ -1,13 +1,31 @@
 # robotcode
 
-> RobotCode CLI plugin for Robot Framework library, resource, keyword, project, and result workflows.
+> Agent skill that teaches AI coding agents to drive [`robotcode`](https://robotcode.io) properly in Robot Framework projects.
 
-This plugin teaches AI coding agents how to drive the [`robotcode`](https://robotcode.io) CLI in a Robot Framework project — picking the right command, respecting `robot.toml` / profiles, using `libdoc` for keyword lookup, the REPL for live exploration, and `results` instead of raw `output.xml`. Once installed, the agent recognises Robot Framework requests ("run the smoke tests", "what failed?", "what does this keyword do?", "try this in a REPL") and reaches for the project-local CLI instead of guessing.
+With this plugin, your AI coding agent uses [`robotcode`](https://robotcode.io) like an experienced Robot Framework engineer — picking the right command for the task and honoring your project's profiles. Instead of guessing, it tries things interactively, looks keywords up against your installed libraries, runs your suites, inspects finished runs, and analyzes the project for issues. Things you can ask:
+
+- "run the smoke suite with the `dev` profile"
+- "rerun just the tests that failed last time"
+- "try the new login flow against the real app, with a visible browser"
+- "does `css=.cart-icon` actually match anything on the live cart page?"
+- "draft a test for password reset, reusing what we already have"
+- "extract this block into a reusable keyword"
+- "why did `Login Works` fail in last night's run?"
+- "summarize the failures from yesterday's nightly run"
+- "what arguments does our `Create Order` keyword take?"
+- "is there already a keyword for waiting until the spinner is gone?"
+- "what keywords does `common.resource` expose?"
+- "list the tags we have and how many tests use each"
+- "set up a `prod` profile with `BASE_URL=https://prod.example.com`"
+- "show me the effective config when I use `-p ci -p docker`"
+- "lint only the files I changed today"
+- "are there any unused keywords or unresolved variables?"
 
 ## Prerequisites
 
-- A Robot Framework project with [`robotcode`](https://robotcode.io/01_quickstart/) available in the project's Python environment (e.g. `pip install robotcode[all]`). The plugin guides the agent in using `robotcode`; it does not install or wrap the CLI itself.
-- An AI agent that supports the [Open Plugin Specification](https://open-plugins.com/plugin-builders/specification). See [supported agents](https://open-plugins.com/supported-agents) for the current list.
+- A Robot Framework project.
+- The [`robotcode`](https://robotcode.io) CLI tools, installed in the project's Python environment (the command-line tool — not to be confused with the VS Code extension of the same name). You can set it up yourself following the [installation guide](https://robotcode.io/03_reference/cli), or let the skill walk you through scope (dev dependency vs. venv-only) and extras (`runner`, `analyze`, `repl`, …) on first use.
+- An AI agent that supports plugins — see [supported agents](https://open-plugins.com/supported-agents) for the current list. Agents without plugin support can still load the skill directly (see [Install](#install)).
 
 ## Install
 
@@ -27,21 +45,14 @@ For Codex, VS Code Copilot Chat, and other Open-Plugins-compliant agents, see th
 
 > Using the [RobotCode VS Code extension](https://marketplace.visualstudio.com/items?itemName=d-biehl.robotcode)? It already bundles this plugin via `contributes.chatPlugins` — no separate install needed for VS Code Copilot Chat.
 
-## What's inside
+**Without the marketplace.** The skill content is plain Markdown, so any agent that loads skill folders from a known directory can use it directly. For Claude Code:
 
-A single Skill:
+```sh
+git clone --depth 1 https://github.com/robotcodedev/robotframework-agent-plugins
+cp -r robotframework-agent-plugins/plugins/robotcode/skills/robotcode ~/.claude/skills/
+```
 
-| Path | Purpose |
-| --- | --- |
-| [`skills/robotcode/SKILL.md`](skills/robotcode/SKILL.md) | Entry point — picking the right mode (explore, author, run, inspect, analyze, discover, look up), CLI overview, output formats, profiles/tags/suites, gotchas. |
-| [`skills/robotcode/references/install.md`](skills/robotcode/references/install.md) | Installing RobotCode into the project's environment, choosing extras (`runner`, `analyze`, `repl`), and recovering from `Error: No such command 'X'`. |
-| [`skills/robotcode/references/authoring.md`](skills/robotcode/references/authoring.md) | Writing tests and reusable keywords — reuse → prototype → analyze → run. |
-| [`skills/robotcode/references/repl.md`](skills/robotcode/references/repl.md) | Interactive REPL for exploration and step-by-step development. |
-| [`skills/robotcode/references/workflows.md`](skills/robotcode/references/workflows.md) | Multi-step recipes — run-and-report, investigate failures, lint changed files, manage suppressions. |
-| [`skills/robotcode/references/results.md`](skills/robotcode/references/results.md) | Inspecting finished runs with `robotcode results` instead of parsing `output.xml`. |
-| [`skills/robotcode/references/large-projects.md`](skills/robotcode/references/large-projects.md) | Filtering, aggregation, and bounded queries for large suites. |
-
-The agent decides when to activate the skill from the description in `SKILL.md`'s frontmatter — no slash command, no explicit invocation needed.
+Other agents have analogous skill directories — consult their docs. The trade-off is that updates won't flow through `plugin marketplace update`; you re-pull manually.
 
 ## Updating
 

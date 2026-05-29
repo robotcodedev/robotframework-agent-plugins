@@ -1,12 +1,12 @@
 # robotframework-agent-plugins
 
-A curated [Open Plugins](https://open-plugins.com/) marketplace for Robot Framework — Skills, hooks, and tools that extend AI coding agents (Claude Code, GitHub Copilot, Codex, OpenCode, …) with Robot Framework expertise.
+A curated [Open Plugins](https://open-plugins.com/) marketplace for Robot Framework — Skills (and more plugin components over time) that extend AI coding agents like Claude Code, GitHub Copilot, and Codex with Robot Framework expertise.
 
 ## Plugins in this marketplace
 
 | Plugin | What it does |
 | --- | --- |
-| [`robotcode`](plugins/robotcode/) | RobotCode CLI workflows: library/keyword lookup via `libdoc`, interactive REPL, test discovery, run, result inspection, and static analysis. |
+| [`robotcode`](plugins/robotcode/) | Teaches AI coding agents to drive `robotcode` properly in Robot Framework projects. |
 
 More plugins are planned — Browser Library, RequestsLibrary, and general Robot Framework patterns.
 
@@ -55,7 +55,7 @@ Then install plugins from the Extensions view's *Chat Plugins* section.
 
 ```sh
 codex plugin marketplace add robotcodedev/robotframework-agent-plugins
-codex plugin install robotcode@robotframework-agent-plugins
+codex plugin add robotcode@robotframework-agent-plugins
 ```
 
 See [Codex plugin docs](https://developers.openai.com/codex/plugins).
@@ -73,16 +73,24 @@ Consult your agent's documentation for the exact command name and any required p
 
 ```
 .plugin/marketplace.json          ← Open Plugins spec marketplace manifest
-.claude-plugin/marketplace.json   ← Claude-specific copy (Claude Code only reads this path)
+.claude-plugin/marketplace.json   ← Claude Code copy (same schema, tool-specific path)
+.agents/plugins/marketplace.json  ← Codex copy (different schema, tool-specific path)
 plugins/
 └── robotcode/
-    ├── .plugin/plugin.json
+    ├── .plugin/plugin.json       ← Open Plugins manifest
+    ├── .codex-plugin/plugin.json ← Codex copy (same data, tool-specific path)
     └── skills/robotcode/
         ├── SKILL.md
         └── references/
 ```
 
-Each plugin is its own directory under `plugins/` with an Open-Plugin-shaped `.plugin/` manifest. The marketplace manifest is mirrored at two paths because Claude Code only looks at `.claude-plugin/marketplace.json` and does not fall back to the vendor-neutral `.plugin/` location that other tools (Copilot CLI, Codex) read.
+Each plugin is its own directory under `plugins/`. The marketplace manifest and per-plugin manifest are duplicated at tool-specific paths because each agent reads only its own location:
+
+| Tool | Marketplace path | Plugin manifest path | Schema |
+| --- | --- | --- | --- |
+| Open Plugins (Copilot CLI, …) | `.plugin/marketplace.json` | `<plugin>/.plugin/plugin.json` | Open Plugins spec |
+| Claude Code | `.claude-plugin/marketplace.json` | `<plugin>/.claude-plugin/plugin.json` (if present, else `.plugin/`) | same as Open Plugins |
+| Codex | `.agents/plugins/marketplace.json` | `<plugin>/.codex-plugin/plugin.json` | Codex-specific (`source` object, `policy`, `category`, `interface`) |
 
 ## Contributing
 
@@ -90,10 +98,13 @@ Plugins are reviewed for quality, accurate documentation, and license compatibil
 
 1. Add your plugin under `plugins/<your-plugin>/` with at minimum:
    - `.plugin/plugin.json` (Open Plugins spec manifest, `"license": "Apache-2.0"`).
+   - `.codex-plugin/plugin.json` — byte-identical copy of `.plugin/plugin.json` so Codex can install the plugin.
    - A skill, agent, hook, or MCP/LSP config — whatever the plugin provides.
    - A `README.md` describing what it does, prerequisites, and how the agent activates it.
    - A `LICENSE` file (Apache-2.0 — copy the one at the repo root) so the plugin stays self-contained when an agent caches it independently of this marketplace.
-2. Register the plugin in **both** marketplace manifests — `.plugin/marketplace.json` and `.claude-plugin/marketplace.json`. The two files must stay byte-identical.
+2. Register the plugin in **all three** marketplace manifests:
+   - `.plugin/marketplace.json` and `.claude-plugin/marketplace.json` — Open Plugins schema, must stay byte-identical.
+   - `.agents/plugins/marketplace.json` — Codex schema (`source` object with `path`, `policy`, `category`, `interface.displayName`).
 3. Open a PR.
 
 ## License
