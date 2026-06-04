@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "inventory questions are resolved with `discover`, never by grepping .robot files",
+  "query": "Which tests in this project have the 'smoke' tag?",
+  "files": ["demo-project — the 'smoke' tag is on 'Login Works' and 'Shipped Order Has Status Shipped'"],
+  "expected_behavior": [
+    "Uses `robotcode discover` to resolve the real set (e.g. `discover tags --tests` or `discover tests -i smoke`)",
+    "Does NOT grep / scan / read .robot files to answer — the effective tag set is resolved at runtime (paths, profiles, variables, pre-run modifiers)",
+    "Reports the matching tests (or that there are none)"
+  ],
+  "must_run": ["robotcode discover"],
+  "must_not_run": ["\\b(grep|rg|ag)\\b[^|]*\\.robot", "\\bfind\\b[^|]*-name[^|]*\\.robot"],
+  "must_not_create": []
+}

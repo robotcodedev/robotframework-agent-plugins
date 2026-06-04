@@ -1,0 +1,15 @@
+{
+  "skills": ["robotcode"],
+  "focus": "REPL debugger (new) — breakpoints can be set interactively at the prompt, not only via --break",
+  "query": "In a robotcode REPL, set a breakpoint on the 'Submit Order' keyword, then run it and show me the call stack when it stops.",
+  "files": ["demo-project — orders.resource defines the 'Submit Order' keyword"],
+  "expected_behavior": [
+    "Uses the REPL's always-on debugger — arms the breakpoint with `.break \"Submit Order\"` at the prompt (or `robotcode repl --break \"Submit Order\"`)",
+    "Runs the keyword so the breakpoint is hit, then shows the stack with `.where`",
+    "Leaves the stop cleanly (`.continue` / `.detach` / `.abort`) — does not hang",
+    "Does not write a .robot file just to host the keyword call"
+  ],
+  "must_run": ["robotcode repl"],
+  "must_not_run": [],
+  "must_not_create": ["\\.robot$"]
+}

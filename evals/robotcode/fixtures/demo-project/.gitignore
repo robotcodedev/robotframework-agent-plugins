@@ -1,0 +1,8 @@
+# Run artifacts — regenerate with ./setup.sh; output.xml embeds absolute paths.
+results/
+output.xml
+log.html
+report.html
+
+# RobotCode analysis cache (recreated on demand)
+.robotcode_cache/

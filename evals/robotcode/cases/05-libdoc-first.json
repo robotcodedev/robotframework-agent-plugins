@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "keyword/argument questions go to project-local `libdoc` first, before generic knowledge or Context7/web",
+  "query": "What arguments does our 'Submit Order' keyword take?",
+  "files": ["demo-project/orders.resource defines the `Submit Order` keyword"],
+  "expected_behavior": [
+    "Uses `robotcode libdoc` against the project's own resource (e.g. `libdoc orders.resource show \"Submit Order\"`) — reflecting the local resource, not generic knowledge",
+    "Does NOT answer from training/generic knowledge, and does not grep the resource file or jump to Context7 / web docs",
+    "Reports the actual signature/arguments returned by libdoc (one argument: ${order_id})"
+  ],
+  "must_run": ["robotcode libdoc"],
+  "must_not_run": [],
+  "must_not_create": []
+}

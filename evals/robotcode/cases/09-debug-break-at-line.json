@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "debugger (new in v2.6.0) — line breakpoint + inspect variables in scope",
+  "query": "Pause execution at tests/login.robot line 25 (the failing assertion in 'Login Works') and show me the variables in scope at that point.",
+  "files": ["demo-project/tests/login.robot — line 25 is the `Should Be Equal ${response}[status] ok` assertion"],
+  "expected_behavior": [
+    "Uses `robotcode robot-debug` with a line breakpoint (`--break tests/login.robot:25`)",
+    "Captures the in-scope variables at the stop (`.vars`, optionally `--user`) — including the ${response} dict",
+    "Steps through it interactively and ends with a resuming command so the run completes"
+  ],
+  "must_run": ["robotcode (robot-debug|run-debug)", "--break[ =]\\S*login\\.robot:25"],
+  "must_not_run": [],
+  "must_not_create": ["\\.robot$"]
+}

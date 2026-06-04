@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "inspect a finished run with `results`, never by reading/parsing output.xml",
+  "query": "Did the last test run pass? If not, what failed and why?",
+  "files": ["demo-project — run ./setup.sh first to create results/output.xml (Login Works fails on purpose)"],
+  "expected_behavior": [
+    "Uses `robotcode results` (e.g. `results summary --failed`, then `results show` / `results log` to drill in) — no re-run",
+    "Does NOT cat / grep / xmllint / open output.xml directly (it can be hundreds of MB; `results` filters server-side)",
+    "Leads the answer with headline counts (X passed, Y failed, Z skipped), then a one-line reason per failure"
+  ],
+  "must_run": ["robotcode results"],
+  "must_not_run": ["\\b(cat|less|head|tail|grep|rg)\\b[^|]*output\\.xml", "xmllint"],
+  "must_not_create": []
+}

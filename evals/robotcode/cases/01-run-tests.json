@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "the simplest case — run tests through robotcode and report pass/fail counts",
+  "query": "Run the smoke tests and tell me how many passed and failed.",
+  "files": ["demo-project — 'smoke' tag is on 'Login Works' (fails) and 'Shipped Order Has Status Shipped' (passes)"],
+  "expected_behavior": [
+    "Runs the suite through `robotcode robot` (or `robotcode run`) with the smoke filter (`-i smoke` / `--include smoke`) — does not call `robot` directly",
+    "Waits for the run to finish and uses the exit code / `robotcode results` for the counts, rather than parsing console output by hand",
+    "Reports headline counts first (X passed, Y failed), then the failing test ('Login Works')"
+  ],
+  "must_run": ["robotcode (robot|run)(?= |$)"],
+  "must_not_run": ["(^|[;&|]\\s*)(robot|rebot)\\b"],
+  "must_not_create": []
+}

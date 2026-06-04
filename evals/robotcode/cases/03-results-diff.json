@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "compare two finished runs with `results diff` to find regressions — needs ./setup.sh first",
+  "query": "Compare the latest run against the baseline and tell me what regressed.",
+  "files": ["demo-project — run ./setup.sh first: it writes results/baseline.xml (all pass) and results/output.xml ('Login Works' fails)"],
+  "expected_behavior": [
+    "Uses `robotcode results diff` (e.g. `results diff results/baseline.xml`, current auto-discovered) — does not hand-compare two output.xml files",
+    "Identifies 'Login Works' as the new failure / regression (optionally with `--only new-failures`)",
+    "Reports the regression plainly; does not dump XML"
+  ],
+  "must_run": ["robotcode results diff"],
+  "must_not_run": ["\\b(cat|less|grep|rg)\\b[^|]*\\.xml", "xmllint"],
+  "must_not_create": []
+}

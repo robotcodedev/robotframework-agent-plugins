@@ -1,0 +1,10 @@
+# Demo fixture project for the robotcode skill evals.
+# Standalone robot.toml — top-level keys (no [tool.robotcode] prefix; that form
+# is only for pyproject.toml).
+
+paths = ["tests"]
+python-path = ["libs"]
+
+# Keep run artifacts in results/ (gitignored). `robotcode results` auto-discovers
+# the output file from this setting, so the results/diff cases just work after setup.sh.
+output-dir = "results"

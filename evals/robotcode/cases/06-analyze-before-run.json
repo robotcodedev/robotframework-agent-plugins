@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "static check before execution — `analyze code` is the fast feedback loop, not a full run",
+  "query": "I just added tests/checkout.robot. Check it for problems before we run anything.",
+  "files": ["demo-project — tests/checkout.robot calls undefined 'Finalize Checkout' (analyze flags KeywordNotFound)"],
+  "expected_behavior": [
+    "Runs `robotcode analyze code tests/checkout.robot` (static analysis — missing keywords, wrong args, unresolved variables) with no execution",
+    "Does NOT execute the suite to 'check' it (the user explicitly said before running)",
+    "Reports the diagnostics found (or a clean result)"
+  ],
+  "must_run": ["robotcode analyze code"],
+  "must_not_run": ["robotcode robot(?: |$)", "robotcode run(?: |$)"],
+  "must_not_create": []
+}

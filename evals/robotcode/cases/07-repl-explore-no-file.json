@@ -1,0 +1,16 @@
+{
+  "skills": ["robotcode"],
+  "focus": "REPL — an exploratory 'watch me' task must NOT become a written .robot test",
+  "requires": "a browser library (SeleniumLibrary or Browser) installed in the project — the only non-offline case; without it the agent should still pick the REPL, but can't actually open a browser",
+  "query": "Open a visible browser, go to https://example.com, and tell me the page title — I want to watch it happen.",
+  "files": ["demo-project + a browser library installed (SeleniumLibrary or Browser, plus `rfbrowser init` for Browser)"],
+  "expected_behavior": [
+    "Starts a REPL (`robotcode repl`) and drives the task live — does NOT write a .robot test file",
+    "Opens the browser non-headless (e.g. `New Browser    headless=False`, or a visible `Open Browser`) so it can be watched, and keeps the session open",
+    "Reports the page title from the live session",
+    "Only offers to save it as a test afterwards, if asked"
+  ],
+  "must_run": ["robotcode repl"],
+  "must_not_run": [],
+  "must_not_create": ["\\.robot$"]
+}
