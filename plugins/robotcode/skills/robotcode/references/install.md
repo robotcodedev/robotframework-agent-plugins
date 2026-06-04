@@ -1,6 +1,6 @@
 # Installing robotcode in a project
 
-Detailed install workflow — read this when `command -v robotcode` (or `Get-Command robotcode` on Windows) comes up empty, **or** when a `robotcode <X>` invocation fails with `Error: No such command 'X'` (which means the sub-package shipping `X` isn't installed).
+Getting `robotcode` into a project's own Python environment — and the right sub-packages (extras) alongside it — so the CLI sees the project's libraries, resources, and local modules. This is the workflow for two situations: `command -v robotcode` (or `Get-Command robotcode` on Windows) comes up empty, **or** a `robotcode <X>` invocation fails with `Error: No such command 'X'` (which means the sub-package shipping `X` isn't installed).
 
 ## Contents
 

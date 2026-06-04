@@ -51,7 +51,13 @@ When the user asks "why did `X` fail?", drill down to that specific test without
    robotcode libdoc <Library> show "<Keyword Name>"
    ```
 
-4. **Re-run just that one test to confirm a fix.**
+4. **If the recorded log isn't enough, re-run under the debugger** to capture the *live* state at the failure. The recorded tree from step 2 is usually sufficient, but when you need a variable's value at a specific point, the live call stack, or to try keywords against the paused context, re-run the test under `robotcode robot-debug` and **step through it interactively**:
+   ```bash
+   robotcode robot-debug -bl "<full longname from step 1>"   # pauses at the first uncaught failure — drive it from there
+   ```
+   It pauses (at the first uncaught failure by default, or a breakpoint you set); inspect with `.where` / `.vars` / `.print ${x}`, move with `.step` / `.next` / `.continue`, and decide each step from what you see. **Always end with a resuming command** (`.continue`/`.detach`/`.abort`) and never start it and wait for its exit — with no input the prompt blocks forever. See [debugging.md](debugging.md).
+
+5. **Re-run just that one test to confirm a fix.**
    ```bash
    robotcode robot -bl "<full longname from step 1>"
    ```
