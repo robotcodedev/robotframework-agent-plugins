@@ -94,21 +94,9 @@ Each plugin is its own directory under `plugins/`. The marketplace manifest and 
 
 ## Contributing
 
-Plugins are reviewed for quality, accurate documentation, and license compatibility with Apache-2.0. To submit a plugin:
+Contributions are welcome — new plugins, improvements to existing ones, bug reports, and docs. In short, to submit a plugin: add it under `plugins/<your-plugin>/` (with `.plugin/plugin.json`, a `README.md`, and a `LICENSE`), register it in the source catalog [`.plugin/marketplace.json`](.plugin/marketplace.json), run `python scripts/sync_manifests.py` to generate the tool-specific copies, and open a PR.
 
-1. Add your plugin under `plugins/<your-plugin>/` with at minimum:
-   - `.plugin/plugin.json` (Open Plugins spec manifest, `"license": "Apache-2.0"`).
-   - A skill, agent, hook, or MCP/LSP config — whatever the plugin provides.
-   - A `README.md` describing what it does, prerequisites, and how the agent activates it.
-   - A `LICENSE` file (Apache-2.0 — copy the one at the repo root) so the plugin stays self-contained when an agent caches it independently of this marketplace.
-2. Register the plugin once in the **source** marketplace catalog `.plugin/marketplace.json` (Open Plugins schema).
-3. If your plugin needs a Codex category other than the default, add it to `CODEX_PLUGIN_CATEGORIES` in [`scripts/sync_manifests.py`](scripts/sync_manifests.py).
-4. Run the manifest generator to populate the Claude and Codex copies:
-   ```sh
-   python scripts/sync_manifests.py
-   ```
-   This writes `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`, and each `plugins/<name>/.codex-plugin/plugin.json`. Run `python scripts/sync_manifests.py --check` in CI / before pushing to verify nothing drifted.
-5. Open a PR.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide — plugin requirements, manifest generation, evals, commit conventions, and signed-commit setup. By participating you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
