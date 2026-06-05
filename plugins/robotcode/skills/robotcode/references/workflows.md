@@ -36,7 +36,6 @@ When the user asks "why did `X` fail?", drill down to that specific test without
 1. **List the failures and pick the exact test.**
    ```bash
    robotcode results show --failed                                # short list with messages
-   robotcode results show --failed --message-chars 0              # full failure messages (no truncation)
    robotcode results show --search "<error fragment>"             # narrow if the user mentioned a symptom
    ```
    The output gives one line per test with the **full longname** (e.g. `MyProject.Acceptance.Login.Login With Invalid Password`). Copy that for the next steps.
@@ -170,7 +169,7 @@ The one thing to get right is that **`output.xml` is not a stable snapshot acros
 2. **Triage against the pinned file — cluster failures, don't debug yet.** Pass `-o` explicitly so you never read a clobbered default:
    ```bash
    robotcode results summary --failed -o results/full.xml
-   robotcode results show --failed --message-chars 0 -o results/full.xml   # full messages, to group by cause
+   robotcode results show --failed -o results/full.xml                     # per-test messages, to group by cause
    robotcode results stats --by suite --failed -o results/full.xml         # is failure clustered in one area?
    ```
    Failures sharing a message, a keyword, or a suite are almost certainly one cause. The recorded error often already names it (an unresolved/mis-composed variable, a wrong value, a missing import) — no debugger needed.
