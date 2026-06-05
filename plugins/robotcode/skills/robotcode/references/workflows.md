@@ -55,13 +55,13 @@ When the user asks "why did `X` fail?", drill down to that specific test without
    ```bash
    robotcode robot-debug -bl "<full longname from step 1>"   # -bl scopes the run to that one test, so the pause lands in it
    ```
-   Select the failing test by name (`-bl` exact, or `-t "<name>"`) rather than handing over the file — only that test runs, and the pause is guaranteed to land inside it instead of on whichever test in the file fails first. It pauses (at the first uncaught failure by default, or a breakpoint you set); inspect with `.where` / `.vars` / `.print ${x}`, move with `.step` / `.next` / `.continue`, and decide each step from what you see. **Always end with a resuming command** (`.continue`/`.detach`/`.abort`) and never start it and wait for its exit — with no input the prompt blocks forever. See [debugging.md](debugging.md).
+   Select the failing test by its **longname** (`-bl`, exact) rather than handing over the file — a bare `.robot` file skips the parent suites' `__init__.robot` (suite setup/variables/tags), so the test runs unlike a real run; selecting by longname builds the full suite tree (its `__init__.robot` runs), only that test executes, and the pause lands inside it instead of on whichever test in the file fails first. It pauses (at the first uncaught failure by default, or a breakpoint you set); inspect with `.where` / `.vars` / `.print ${x}`, move with `.step` / `.next` / `.continue`, and decide each step from what you see. **Always end with a resuming command** (`.continue`/`.detach`/`.abort`) and never start it and wait for its exit — with no input the prompt blocks forever. See [debugging.md](debugging.md).
 
 5. **Re-run just that one test to confirm a fix.**
    ```bash
    robotcode robot -bl "<full longname from step 1>"
    ```
-   For re-validating *several* previously failing tests at once — or making a whole run of failures green — see **workflow E**, which feeds `--rerunfailed` from a *pinned* output file (the default `output.xml` is overwritten by intermediate runs, including the `robot-debug` run in step 4, so it's not a reliable rerun source).
+   By longname, not the file path — so the parent suites' `__init__.robot` runs and the confirm-run matches a real run (a bare `.robot` file would skip that directory-level setup). For re-validating *several* previously failing tests at once — or making a whole run of failures green — see **workflow E**, which feeds `--rerunfailed` from a *pinned* output file (the default `output.xml` is overwritten by intermediate runs, including the `robot-debug` run in step 4, so it's not a reliable rerun source).
 
 ## C. Lint only the files about to commit
 
@@ -90,12 +90,9 @@ When the user asks "find issues in my robot code", "are there unused keywords?",
    robotcode analyze code --severity error          # only errors in output, summary, and exit code
    robotcode analyze code --code KeywordNotFound     # only one diagnostic code (severity unchanged)
    ```
-   For machine consumption, `analyze code` honors the global `-f json` and also has its own report formats:
+   For machine consumption, `analyze code` honors the global `-f json`:
    ```bash
    robotcode -f json analyze code                                   # JSON to stdout
-   robotcode analyze code --output-format sarif --output-file r.sarif   # SARIF artefact for CI upload
-   robotcode analyze code --output-format github                    # GitHub Actions annotations
-   robotcode analyze code --output-format gitlab --output-file cq.json  # GitLab Code Quality report
    ```
 
 3. **Find unused keywords and variables** — this is **off by default**; the flag must be added explicitly:
