@@ -1,6 +1,6 @@
 # Interactive development & exploration — `robotcode repl`
 
-`robotcode repl` is an interactive Robot Framework shell that runs inside the project's configuration — the same `robot.toml`, profiles, Python environment, and imports a real run uses. You type keyword calls one line at a time and they execute immediately, and the session's state — variables, imports, library instances, open browsers and connections — persists for as long as it stays open. That makes it the tool for **interactive, step-by-step work**: *exploring* (drive a system under test, try a keyword or library, debug why a test fails, stabilize a locator or wait) and *developing* (build up a test case or reusable keyword one line at a time, confirm each step, then save it). Reach for it even when the user never says "REPL" — "try this keyword interactively" or "let's build the test as we go" both point here.
+`robotcode repl` is an interactive Robot Framework shell that runs inside the project's configuration — the same `robot.toml`, profiles, Python environment, and imports a real run uses. You type keyword calls one line at a time and they execute immediately, and the session's state — variables, imports, library instances, open browsers and connections — persists for as long as it stays open. That makes it the tool for **interactive, step-by-step work**: *exploring* (drive a system under test, try a keyword or library, debug a misbehaving keyword as you call it, stabilize a locator or wait) and *developing* (build up a test case or reusable keyword one line at a time, confirm each step, then save it). Reach for it even when the user never says "REPL" — "try this keyword interactively" or "let's build the test as we go" both point here.
 
 The REPL serves **two distinct purposes** — use whichever fits the request:
 
@@ -100,7 +100,7 @@ A **human** on the rich backend also gets Tab completion, syntax highlighting, p
 
 A debugger is attached for the **whole REPL session** — always on, nothing to start. That lets you debug a keyword *as you build it*: arm a breakpoint, run the keyword, and when it's hit, execution pauses in a `(rdb)` prompt with the live call stack, the variables in each frame, a source listing, and the ability to run further keywords in the paused context.
 
-This is for debugging a keyword **you call yourself at the prompt** while building or exploring it. To debug an **existing failing test or suite**, don't paste or rebuild it in here — run the real one in place with [`robotcode robot-debug`](debugging.md) (`-bl "<longname>"` / `-t` / a path), which keeps the suite's setup/teardown, variables, and imports intact.
+This is for debugging a keyword **you call yourself at the prompt** while building or exploring it. To debug an **existing failing test**, don't paste or rebuild it in here — run the real one in place with [`robotcode robot-debug`](debugging.md), scoped to that one test by name (`-bl "<longname>"` / `-t "<name>"`, not the whole file), which keeps the suite's setup/teardown, variables, and imports intact.
 
 Breakpoints can be armed three ways — the interactive one is unique to the REPL:
 
@@ -108,7 +108,7 @@ Breakpoints can be armed three ways — the interactive one is unique to the REP
 - **From the start, via flags**: `robotcode repl --break "<Keyword>"` / `--break file.robot:42`, plus the `--break-on-*` exception flags, arm breakpoints before the first prompt.
 - **From the file**: an embedded `Breakpoint` keyword (after `Library    robotcode.repl.Repl`) pauses whenever the debugger is attached — a no-op in a normal `robot` run.
 
-At a `(rdb)` stop you get the full debug command set — `.where` (stack), `.vars` (variables), `.print ${x}`, `.step` / `.next` / `.continue`, and the rest. It is the *same* debugger as [`robotcode robot-debug`](debugging.md), which runs a whole suite under it rather than single keywords at the prompt — **[debugging.md](debugging.md) is the full reference** for the breakpoint types, every debug command, and stepping through a session interactively.
+At a `(rdb)` stop you get the full debug command set — `.where` (stack), `.vars` (variables), `.print ${x}`, `.step` / `.next` / `.continue`, and the rest. It is the *same* debugger as [`robotcode robot-debug`](debugging.md), which attaches it to a real run through the runner (scoped to whatever test/suite you select) rather than to single keywords typed at the prompt — **[debugging.md](debugging.md) is the full reference** for the breakpoint types, every debug command, and stepping through a session interactively.
 
 One trap: at the `(rdb)` prompt `Ctrl-C` / `Ctrl-D` **resume** the run (the opposite of the `>>>` prompt, where they exit) — leave a stop with `.continue` / `.detach` / `.abort`.
 

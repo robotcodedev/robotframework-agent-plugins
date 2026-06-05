@@ -5,6 +5,7 @@
   "files": ["demo-project/tests/login.robot — line 25 is the `Should Be Equal ${response}[status] ok` assertion"],
   "expected_behavior": [
     "Uses `robotcode robot-debug` with a line breakpoint (`--break tests/login.robot:25`)",
+    "Scopes the run to the one test (`-t \"Login Works\"` / `-bl`) alongside the line breakpoint, so only that test executes and the stop lands in it — rather than running the whole file",
     "Captures the in-scope variables at the stop (`.vars`, optionally `--user`) — including the ${response} dict",
     "Steps through it interactively and ends with a resuming command so the run completes"
   ],

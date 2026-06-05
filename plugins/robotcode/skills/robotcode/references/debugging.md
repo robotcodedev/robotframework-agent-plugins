@@ -8,13 +8,13 @@ Reach for the debugger when a recorded log isn't enough and you need the **live*
 - **[REPL](repl.md)** builds state up from scratch to *explore* — no suite is running.
 - **The debugger** re-runs the suite and stops it **mid-flight** to inspect the actual live state. Use it only when the recorded log doesn't answer the question.
 
-**To debug why a test fails, debug *that* test — fast.** Point `robot-debug` at the real one with the usual `robotcode robot` selectors (`-bl "<longname>"`, `-t`, `-s`, or a path) and let it pause at the failure. Read the recorded error with [`results`](results.md) first — it often already names the cause (a variable or value, not what poking the live system would suggest) — then bring up the debugger for the live values if you still need them. Do **not** reconstruct or paste the test into a REPL (that runs a *copy* in a different context, dropping the suite's setup/teardown, variables, and imports), and do **not** detour into external tools or a separate exploration of the system under test first: that debugs the wrong context and routinely chases the wrong cause — a symptom in the live system, when the real fault was a variable, value, or setup in the test.
+**To debug why a test fails, debug *that* test — fast.** Select the single failing test by name — `-t "<name>"`, or `-bl "<longname>"` for an exact match copied from [`results`](results.md) / `discover` — rather than handing `robot-debug` the whole file or directory. Narrowing the run to one test means only it executes and the pause lands inside it; a bare path (`tests/login.robot`) runs *every* test in the file and, with break-on-failure on by default, stops at the **first** uncaught failure in execution order — which may be a different test. Read the recorded error with [`results`](results.md) first — it often already names the cause (a variable or value, not what poking the live system would suggest) — then bring up the debugger for the live values if you still need them. Do **not** reconstruct or paste the test into a REPL (that runs a *copy* in a different context, dropping the suite's setup/teardown, variables, and imports), and do **not** detour into external tools or a separate exploration of the system under test first: that debugs the wrong context and routinely chases the wrong cause — a symptom in the live system, when the real fault was a variable, value, or setup in the test.
 
 ## Contents
 
-- **Two ways in** — `robot-debug` (whole suite) vs. `repl` (interactive)
+- **Two ways in** — `robot-debug` (a real run, scoped to the tests you select) vs. `repl` (keywords typed at the prompt)
 - **How a debug session works** — the pause → inspect → resume loop
-- **Setting breakpoints** — line, keyword, embedded `Breakpoint`, stop-on-entry, exceptions
+- **Setting breakpoints** — line, keyword, location vs. run scope, embedded `Breakpoint`, stop-on-entry, exceptions
 - **At a stop: inspecting state** — stack & frames, variables, source, what's loaded (keywords / libraries / resources)
 - **Stepping & resuming**
 - **Managing breakpoints at runtime** — conditions, ignore counts, logpoints
@@ -26,7 +26,7 @@ Reach for the debugger when a recorded log isn't enough and you need the **live*
 
 ## Two ways in
 
-- **`robotcode robot-debug`** (alias `run-debug`) — debug a whole suite. Takes the **full [`robotcode robot`](../SKILL.md) option set** (paths, `-v`, `-i`/`-e`/`-s`/`-t`, `--profile`, …) plus the trigger flags below.
+- **`robotcode robot-debug`** (alias `run-debug`) — debug a run, scoped however you need: narrow it to a single test with `-t`/`-bl` (the usual case when debugging one failure), to a suite or tag, or run the lot. Takes the **full [`robotcode robot`](../SKILL.md) option set** (paths, `-v`, `-i`/`-e`/`-s`/`-t`, `--profile`, …) plus the trigger flags below.
 - **`robotcode repl`** — the *same* debugger is **always attached** to the [REPL](repl.md). Arm a breakpoint up front with `--break …`, or interactively at the prompt with `.break` (a keyword name *or* a `file:line`, no restart); running a keyword that reaches it drops you into the same `(rdb)` prompt. Use it to debug a keyword while you build it up — see [repl.md](repl.md#debugging-from-the-repl).
 
 Both come from the optional **`repl`** extra. `Error: No such command 'robot-debug'` means it's missing — see [install.md](install.md) (`pip install robotcode[repl]`, or `[all]`).
@@ -59,7 +59,18 @@ Triggers combine freely. Pass them to `robot-debug` (most also work on `repl`):
 | **Every failure** | `--break-on-all-exceptions` — pause at *every* failing keyword, even caught ones. |
 | **Failing test / suite** | `--break-on-failed-test` / `--break-on-failed-suite` — pause at the end of a failing test / suite. |
 
-A **keyword breakpoint** matches by exact name — the bare name (`--break "Open Browser"`) or the fully-qualified `Library.Keyword` form (`--break "SeleniumLibrary.Open Browser"`) to disambiguate a name two libraries share. Unlike Robot's own lookup the match is **case- and whitespace-sensitive**, so spell it as it appears in the run. Because *uncaught failure* is armed by default, `robotcode robot-debug tests/` with no flags already drops you at the first real failure with its state intact.
+A **keyword breakpoint** matches by exact name — the bare name (`--break "Open Browser"`) or the fully-qualified `Library.Keyword` form (`--break "SeleniumLibrary.Open Browser"`) to disambiguate a name two libraries share. Unlike Robot's own lookup the match is **case- and whitespace-sensitive**, so spell it as it appears in the run. Because *uncaught failure* is armed by default, `robotcode robot-debug tests/` with no flags already drops you at the first real failure with its state intact — that whole-suite form is for *finding* an unknown failure.
+
+### Breakpoint location vs. run scope
+
+A `file:line` or keyword breakpoint says *where* to stop; the `robotcode robot` selectors say *what runs*. When you already know which test you're debugging, set the breakpoint where you need it **and** narrow the run to that one test:
+
+```bash
+robotcode robot-debug -bl "MyProject.Login.Login Works"                  # only this test runs; pause at its failure
+robotcode robot-debug --break login.robot:42 -t "Login Works"            # break at the line, but only run that test
+```
+
+Handing over a bare path (`tests/login.robot`) instead runs every test in the file — slower, and it can stop on a *different* test that reaches the line or fails first. Reserve the bare-path form for when you genuinely want the whole file/suite (e.g. hunting an unknown failure).
 
 ### The embedded `Breakpoint` keyword
 
@@ -192,7 +203,7 @@ The one thing never to do is start `robot-debug` and then **block on its exit co
 
 The core pattern: **arm a breakpoint → inspect the live state → resume**, instead of guessing from a static log. No agent flags are required — RobotCode auto-detects the agent session and uses the capture-safe **plain backend** (`--plain` forces it explicitly); same detection/overrides as the REPL (see [repl.md](repl.md)). The full `robotcode robot` option set still applies, so scope the debugged run like any other (`-bl "<longname>"`, `-i <tag>`, `-v …`, `--profile …`).
 
-> **Fallback only if your agent can't drive a terminal.** When you can only run a command to completion, pipe a *predetermined* command sequence that ends in a resuming command — e.g. `printf '.where\n.vars --user\n.continue\n' | robotcode robot-debug tests/login.robot`. This gives up the back-and-forth, so prefer interactive whenever you can.
+> **Fallback only if your agent can't drive a terminal.** When you can only run a command to completion, pipe a *predetermined* command sequence that ends in a resuming command — e.g. `printf '.where\n.vars --user\n.continue\n' | robotcode robot-debug -t "Login Works"`. This gives up the back-and-forth, so prefer interactive whenever you can.
 
 ## A session, end to end
 

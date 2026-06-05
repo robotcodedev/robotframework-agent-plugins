@@ -5,13 +5,13 @@
   "files": ["demo-project — tests/login.robot 'Login Works' fails on purpose, with a ${response} dict to inspect"],
   "expected_behavior": [
     "Recognizes this as a live-debugging task and reaches for `robotcode robot-debug` (not only reading the finished log with `results`)",
-    "Debugs the ACTUAL test in place — `robot-debug` targets it (e.g. `-bl`/`-t`/path) — and does NOT start a REPL to reconstruct or paste the test body into it",
+    "Debugs the ACTUAL test in place, scoping `robot-debug` to that one test by name (`-t \"Login Works\"` or `-bl \"<longname>\"`) rather than handing over the whole file (a bare path runs every test in login.robot and could pause on a different one) — and does NOT start a REPL to reconstruct or paste the test body into it",
     "Inspects the value at the stop — e.g. `.print ${response}` / `.vars` — rather than guessing",
     "Steps through it interactively (stop → `.where` / `.vars` / `.print` → choose the next command) and ends with a resuming command (`.continue` / `.detach` / `.abort`); does not start it and block waiting for exit",
     "Stays in the test's own context — does NOT detour into external tools (a separate browser / SUT session, an MCP probe) or generic exploration to diagnose it",
     "Does NOT write a new .robot file to reproduce the failure"
   ],
-  "must_run": ["robotcode (robot-debug|run-debug)"],
+  "must_run": ["robotcode (robot-debug|run-debug)", "robotcode (robot-debug|run-debug)\\b[^\\n]*\\s(-t|--test|-bl|--by-longname)[ =]"],
   "must_not_run": ["robotcode repl\\b", "\\bcat\\b[^|]*output\\.xml", "xmllint"],
   "must_not_create": ["\\.robot$"]
 }

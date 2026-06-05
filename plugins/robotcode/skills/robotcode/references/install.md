@@ -31,11 +31,11 @@ Minimum for this skill is `robotcode[runner,analyze,repl]`:
 
 - `runner` — `robotcode robot` / `run` / `rebot` / `discover` / `libdoc` / `testdoc` / `results`
 - `analyze` — `robotcode analyze code` and `robotcode analyze cache`
-- `repl` — `robotcode repl`
+- `repl` — `robotcode repl` (interactive shell) **and** `robotcode robot-debug` / `run-debug` (the command-line debugger). Both ship in `repl` — the command-line debugger is **not** in the `debugger` extra below.
 
 Other available extras the user may want included:
 
-- `debugger` — `robotcode debug` (DAP server for step-debugging)
+- `debugger` — `robotcode debug`, the Debug Adapter Protocol server the editor extensions drive for graphical step-debugging. This is **not** what `robotcode robot-debug` needs (that's the `repl` extra above); only add `debugger` for DAP/editor integration.
 - `languageserver` — LSP for IDE integration (usually installed by the VS Code / Neovim extension automatically, not manually)
 - `replserver` — network-attachable REPL
 - `yaml` — YAML variable files
@@ -91,8 +91,8 @@ Error: No such command 'analyze'.
 | --- | --- |
 | `robot` / `run` / `rebot` / `discover` / `libdoc` / `testdoc` / `results` | `runner` |
 | `analyze code` / `analyze cache` | `analyze` |
-| `repl` | `repl` |
-| `debug` | `debugger` |
+| `repl` / `robot-debug` / `run-debug` | `repl` |
+| `debug` (DAP server for editors) | `debugger` |
 | `repl-server` | `replserver` |
 
 Treat it the same way as a fresh install: **ask the user before adding the missing extra.** One user-prompt round-trip covers:
