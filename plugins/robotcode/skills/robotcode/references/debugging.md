@@ -12,17 +12,17 @@ Reach for the debugger when a recorded log isn't enough and you need the **live*
 
 ## Contents
 
-- **Two ways in** — `robot-debug` (a real run, scoped to the tests you select) vs. `repl` (keywords typed at the prompt)
-- **How a debug session works** — the pause → inspect → resume loop
-- **Setting breakpoints** — line, keyword, location vs. run scope, embedded `Breakpoint`, stop-on-entry, exceptions
-- **At a stop: inspecting state** — stack & frames, variables, source, what's loaded (keywords / libraries / resources)
-- **Stepping & resuming**
-- **Managing breakpoints at runtime** — conditions, ignore counts, logpoints
-- **Exception breakpoints** — `.catch`
-- **Ending a session** — `.continue` / `.detach` / `.abort`
-- **Driving the session from an agent** — step through it interactively (the normal way)
-- **A session, end to end**
-- **Relationship to the VS Code debugger**
+- **[Two ways in](#two-ways-in)** — `robot-debug` (a real run, scoped to the tests you select) vs. `repl` (keywords typed at the prompt)
+- **[How a debug session works](#how-a-debug-session-works)** — the pause → inspect → resume loop
+- **[Setting breakpoints](#setting-breakpoints)** — line, keyword, location vs. run scope, embedded `Breakpoint`, stop-on-entry, exceptions
+- **[At a stop: inspecting state](#at-a-stop-inspecting-state)** — stack & frames, variables, source, what's loaded (keywords / libraries / resources)
+- **[Stepping & resuming](#stepping--resuming)**
+- **[Managing breakpoints at runtime](#managing-breakpoints-at-runtime)** — conditions, ignore counts, logpoints
+- **[Exception breakpoints](#exception-breakpoints)** — `.catch`
+- **[Ending a session](#ending-a-session)** — `.continue` / `.detach` / `.abort`
+- **[Driving the session from an agent](#driving-the-session-from-an-agent)** — step through it interactively (the normal way)
+- **[A session, end to end](#a-session-end-to-end)**
+- **[Relationship to the VS Code debugger](#relationship-to-the-vs-code-debugger)**
 
 ## Two ways in
 
@@ -70,7 +70,7 @@ robotcode robot-debug -bl "MyProject.Login.Login Works"                  # only 
 robotcode robot-debug --break login.robot:42 -t "Login Works"            # break at the line, but only run that test
 ```
 
-Handing over a bare **file** path (`tests/login.robot`) instead skips the parent suites' `__init__.robot` — its Suite Setup/Teardown, suite variables, and the setup/tags/timeouts applied to the tests below — so the test runs without its directory-level initialization and can behave differently than in a real run; it also runs *every* test in the file, which with break-on-failure on can stop on a *different* test first. Select by longname so the full suite tree (and its `__init__.robot`) is built, exactly as `robotcode robot` would. Reserve a path for when you genuinely want a whole suite — and note a *directory* like `tests/` still loads that directory's `__init__.robot` (e.g. when hunting an unknown failure), whereas a single file does not.
+Handing over a bare **file** path (`tests/login.robot`) instead runs *every* test in the file — so, with break-on-failure on, it can stop on a *different* test first — **and** skips the parent suites' `__init__.robot` (the setup/variables loss described above). Select by longname; reserve a path for a whole suite — and note a *directory* like `tests/` still loads its `__init__.robot`, whereas a single file does not.
 
 ### The embedded `Breakpoint` keyword
 

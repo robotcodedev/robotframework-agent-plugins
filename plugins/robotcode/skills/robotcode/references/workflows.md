@@ -72,80 +72,18 @@ git diff --name-only --diff-filter=ACMR HEAD | grep -E '\.(robot|resource)$' \
   | xargs -r robotcode analyze code
 ```
 
-Exit code is a bitmask (see "Static analysis" in SKILL.md): non-zero with bit 1 set means errors — block the commit; only bits 2+ (warnings/infos/hints) means non-blocking.
+Exit code is a bitmask (see [analyze.md](analyze.md)): non-zero with bit 1 set means errors — block the commit; only bits 2+ (warnings/infos/hints) means non-blocking.
 
 ## D. Analyse a project for code issues
 
-When the user asks "find issues in my robot code", "are there unused keywords?", "analyse the project", etc. — `analyze code` is the entry point. Output format is one diagnostic per line: `path:line:col: [SEVERITY] CODE: message`, plus a `Files: N, Errors: N, Warnings: N, Infos: N, Hints: N` summary at the end. Exit code is a **bitmask** (1=errors, 2=warnings, 4=infos, 8=hints — see "Static analysis" in SKILL.md).
+Full static-analysis sweep and cleanup. `analyze code` is the entry point — **[analyze.md](analyze.md)** is the full reference (every flag, the diagnostic codes, the four suppression scopes, exit-code masking, the cache). The order that works:
 
-1. **Baseline scan.** No path = whatever `paths` in `robot.toml` covers.
-   ```bash
-   robotcode analyze code
-   robotcode analyze code --filter '**/*.robot'        # narrow by glob
-   robotcode analyze code tests/acceptance/billing/    # narrow by path
-   ```
-
-2. **Focus on errors first** if the output is long. Errors are usually the only diagnostics CI should block on. Use the built-in severity filter rather than grepping the text (the severity tag is the full word `[ERROR]`, so `grep '\[E\]'` would match nothing):
-   ```bash
-   robotcode analyze code --severity error          # only errors in output, summary, and exit code
-   robotcode analyze code --code KeywordNotFound     # only one diagnostic code (severity unchanged)
-   ```
-   For machine consumption, `analyze code` honors the global `-f json`:
-   ```bash
-   robotcode -f json analyze code                                   # JSON to stdout
-   ```
-
-3. **Find unused keywords and variables** — this is **off by default**; the flag must be added explicitly:
-   ```bash
-   robotcode analyze code --collect-unused
-   ```
-   Surfaces `KeywordNotUsed` / `VariableNotUsed` diagnostics. Useful for cleanup, but generates noise on libraries that *intentionally* export keywords for other projects to use — combine with `-mi KeywordNotUsed` on `lib/` paths if needed, or persist the policy in config (step 4).
-
-4. **Suppress diagnostics that genuinely don't apply.** Four scopes, pick the lowest one that solves the problem:
-
-   - **One line of code**, end-of-line comment:
-     ```robotframework
-     Log    ${maybe_undefined}    # robotcode: ignore[VariableNotFound]
-     ```
-   - **A whole block / file**, column-0 comment (applies until block ends):
-     ```robotframework
-     # robotcode: ignore[KeywordNotFound]
-     Some Keyword That Resolves At Runtime
-     ```
-   - **One command invocation**:
-     ```bash
-     robotcode analyze code -mi MultipleKeywords
-     ```
-   - **Project-wide** (when a diagnostic is genuinely wrong for this whole project), in `robot.toml`:
-     ```toml
-     [tool.robotcode-analyze.code]
-     modifiers = { ignore = ["MultipleKeywords"] }
-     ```
-   You can also **re-classify** rather than ignore — `-me <CODE>` to promote to error, `-mw` to warning, `-mI` to info, `-mh` to hint (and the matching keys in `[tool.robotcode-analyze.code].modifiers`: `error = [...]`, `warning = [...]`, `information = [...]`, `hint = [...]`).
-
-5. **Decide what fails CI** by masking severities out of the exit code:
-   ```bash
-   robotcode analyze code -xm warn -xm info -xm hint
-   ```
-   Or persistently in `robot.toml`:
-   ```toml
-   [tool.robotcode-analyze.code]
-   exit-code-mask = ["warn", "info", "hint"]   # only errors fail the build
-   ```
-   `-xe`/`extend-exit-code-mask` appends to whatever the config already defines instead of replacing it.
-
-6. **When the cache might mislead you.** `analyze code` reuses analyzed library/resource data across runs to keep subsequent runs fast. Two situations where the cache matters:
-
-   - **Stale results** — after refactoring imports, upgrading libraries, or switching branches, cached namespace data may not match the current code. Symptoms: diagnostics that don't make sense, or new issues that should appear but don't. Wipe the cache:
-     ```bash
-     robotcode analyze cache clear
-     ```
-   - **Verify against a fresh analysis** — to rule out a stale-cache effect without permanently wiping, run once with caching off:
-     ```bash
-     robotcode analyze code --no-cache-namespaces
-     ```
-
-   Inspect what's cached with `robotcode analyze cache info` (or `list` / `path`). `cache clear` empties the cache contents; `cache prune` removes the entire cache directory.
+1. **Baseline scan** — `robotcode analyze code` (no path = `robot.toml` `paths`; narrow with a path or `--filter '<glob>'`).
+2. **Errors first** — `--severity error` (CI usually blocks only on errors; the severity tag is a full word, so filter, don't `grep`).
+3. **Unused items** — add `--collect-unused` for `KeywordNotUsed` / `VariableNotUsed` (off by default; noisy on intentionally-exported keywords).
+4. **Suppress what genuinely doesn't apply** — inline `# robotcode: ignore[CODE]`, `-mi CODE` for one run, or project-wide in `robot.toml`.
+5. **Gate CI** — the exit code is a bitmask (`1` errors, `2` warnings, `4` infos, `8` hints); mask the non-blocking ones (`-xm warn -xm info -xm hint`, or `exit-code-mask` in `robot.toml`).
+6. **Stale cache?** — after refactors, upgrades, or branch switches, `robotcode analyze cache clear` (or `--no-cache-namespaces` for a one-off).
 
 ## E. Fix a whole failing run
 
