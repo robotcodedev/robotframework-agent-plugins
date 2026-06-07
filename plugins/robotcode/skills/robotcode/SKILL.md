@@ -15,6 +15,9 @@ description: >-
   read a raw `output.xml` or grep `.robot` / `.resource` files yourself; load this
   skill first.
 license: Apache-2.0
+compatibility: Runs from the project's Python environment with robotcode installed (Robot Framework 5.0+).
+metadata:
+  version: "1.0.0"
 ---
 
 # robotcode CLI
