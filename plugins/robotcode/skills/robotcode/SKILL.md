@@ -229,7 +229,22 @@ Target one test by its **longname** (`-bl`), never a bare `.robot` file — a fi
 | List profiles | `robotcode profiles list` |
 | Show a profile | `robotcode --profile <name> profiles show` |
 
-Use `config show` for resolution questions. Use `config info` for supported keys and setting descriptions. Select profiles with the global `--profile <name>` option before the subcommand.
+Use `config show` for resolution questions ("what's my effective config?"). **When writing or editing `robot.toml` or a profile, look up the exact key, its type, and a TOML example with `config info desc <key>` (wildcards work: `*tag*`, `rebot.*`) or `config info list` — don't guess settings — then confirm the merged result with `config show`.** Select profiles with the global `--profile <name>` option before the subcommand.
+
+For example, to add a library search path — look the key up, write it, then verify:
+
+```bash
+robotcode config info desc python-path     # exact key, its type, and a TOML example
+```
+
+```toml
+# robot.toml
+python-path = ["libs/", "resources/"]
+```
+
+```bash
+robotcode config show                       # confirm it resolved as expected
+```
 
 **Multiple profiles merge.** `--profile` is repeatable and each value is a glob against the defined profile names, so `-p ci -p "docker*"` selects and combines several profiles into one effective configuration:
 
