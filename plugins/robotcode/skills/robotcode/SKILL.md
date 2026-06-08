@@ -1,7 +1,7 @@
 ---
 name: robotcode
 description: >-
-  Robot Framework and RobotCode help for test-automation projects — `.robot` and
+  Robot Framework and RobotCode help for testing and RPA projects — `.robot` and
   `.resource` files, `robot.toml`, `output.xml`. Use it whenever the user writes
   or runs a suite (or a single test or task), or narrows a run to a subset by tag,
   suite, or name; asks why a suite or test failed or won't run, or wants to fix,
@@ -43,7 +43,15 @@ Decide what the user actually wants *before* reaching for a command — these in
 - **Configure the project** — *"set up robot.toml", "add a CI profile", "configure variables/paths", "what's my effective config?".* See [references/config.md](references/config.md).
 - **Look up a keyword or library** — *"what does X do?", "what args does it take?".* See [Documentation lookup priority](#documentation-lookup-priority).
 
-For **standalone exploration** ("watch me", "try …", "do it for me") prefer the REPL over writing a throwaway `.robot` file — a working session promotes into a test cheaply (`.save`), whereas a prematurely written test wastes effort, can't be watched, and tears its browser/connection down at the run's end. But the moment a **real test or suite** is in play — fixing it, stepping it, or asking *why it fails* — use the **debugger** (or read the recorded failure with [`results`](references/results.md) first), **not the REPL**, because only the debugger runs the test in its real context. In short: **the REPL is for trying things out; the debugger is for debugging a test.**
+For **standalone exploration** ("watch me", "try …", "do it for me") prefer the REPL over writing a throwaway `.robot` file — a working session promotes into a test cheaply (`.save`), whereas a prematurely written test wastes effort, can't be watched, and tears its browser/connection down at the run's end. But the moment a **real test or suite** is in play — fixing it, stepping it, or asking *why it fails* — use the **debugger** (or read the recorded failure with [`results`](references/results.md) first), **not the REPL**, because only the debugger runs the test in its real context. In short: **the REPL is for trying things out; the debugger is for debugging a real test or task.**
+
+## Tests or tasks? (RPA)
+
+Robot Framework does acceptance **testing** *and* **RPA** (robotic process automation) with the same engine, files, and `robotcode` commands — only the vocabulary differs. An RPA suite holds **`*** Tasks ***`** instead of `*** Test Cases ***`, its items are **tasks**, and reports say "task" where a test run says "test". **Everything in this skill applies to tasks — read "test" as "task" throughout.** Specifics:
+
+- **Run mode (`robot` / `rebot` only):** a `*** Tasks ***` header makes a suite RPA; for a *run*, `robotcode robot --rpa` forces task mode and `rebot --rpa` reports in it. This `--rpa` flag is **only** for running/reporting — don't add it to `discover`, `analyze`, or any other command. **Don't mix test files and task files in one run — Robot Framework treats that as an error.**
+- **Select & discover (no mode flag):** to list tasks, use `robotcode discover tasks` — `discover tests` / `discover all` find them too, since a task *is* a test internally; never pass `--rpa` to `discover`. `--task` is Robot Framework's alias for `--test`; `-t` / `-bl` select tasks the same way.
+- **Settings & keywords:** in a task suite, `Task Setup` / `Task Teardown` / `Task Template` / `Task Timeout` and `Set Task Variable` replace their `Test*` counterparts.
 
 ## Documentation lookup priority
 
@@ -116,7 +124,7 @@ Use JSON only when a script, `jq`, CI pipeline, editor integration, or nested tr
 | **Profile** | Named preset in `robot.toml` / `pyproject.toml` | "use the dev profile", "ci + docker profiles" | `--profile <name>` before the subcommand (repeatable; multiple merge) |
 | **Tag** | `[Tags]` label on tests/tasks | "smoke tests", "slow ones" | `-i <tag>` / `-e <tag>` |
 | **Suite** | `.robot` file or directory-derived suite | "Login suite" | `-s <name-pattern>` |
-| **Test** | One `*** Test Cases ***` entry | "test called Login Works" | `-t <name-pattern>` or `-bl <longname>` |
+| **Test** / **Task** | One `*** Test Cases ***` entry (or `*** Tasks ***` in RPA) | "test called Login Works", "the task" | `-t <name-pattern>` (alias `--task`) or `-bl <longname>` |
 
 When wording is ambiguous, verify instead of guessing:
 
@@ -273,8 +281,8 @@ For multi-step workflows, see [references/workflows.md](references/workflows.md)
 - `uvx` / `pipx` isolates RobotCode from the project and gives wrong answers for real projects.
 - `No profiles defined.` is an empty result, not an error.
 - REPL syntax is not `.robot` file syntax.
-- **A real test case is involved → `robotcode robot-debug`, never the REPL.** Running, watching, stepping, or inspecting a `*** Test Cases ***` entry live — *not only when it fails* — is the debugger: `robot-debug -bl "<longname>"` pauses the real run so you inspect the live stack/variables and run keywords at the `(rdb)` stop, with the suite's setup, variables, imports, and `__init__.robot` all live. The REPL has **no test case** — it runs only the keywords you type, in a different context — so "trying the test in the REPL" runs a misleading *copy*. The REPL is only for when **no** test case is in play (a keyword, a library, free exploration). "Interactive" alone does not mean REPL.
-- **One test → select it by longname (`-bl`), never a bare `.robot` file — for `robotcode robot` and `robot-debug` alike.** The file holds other tests (all run) and skips the parent `__init__.robot` (setup/variables), so it behaves unlike a real run. Longname from `discover`/`results`; a whole suite → pass the *directory*.
-- **"Fix this test" / "why does it fail or not run?"** → read the recorded error first with `robotcode results` (`show --failed`, `log`) — it often names the cause; if not, debug the *actual* test with `robotcode robot-debug -bl "<longname>"` (longname rule above). Don't reconstruct it in a REPL or detour into external tools / an MCP probe first — that's a *different context* and chases the wrong cause.
+- **A real test case is involved → `robotcode robot-debug`, never the REPL.** Running, watching, stepping, or inspecting a `*** Test Cases ***` (or `*** Tasks ***`) entry live — *not only when it fails* — is the debugger: `robot-debug -bl "<longname>"` pauses the real run so you inspect the live stack/variables and run keywords at the `(rdb)` stop, with the suite's setup, variables, imports, and `__init__.robot` all live. The REPL has **no test or task** — it runs only the keywords you type, in a different context — so "trying the test in the REPL" runs a misleading *copy*. The REPL is only for when **no** test or task is in play (a keyword, a library, free exploration). "Interactive" alone does not mean REPL.
+- **One test or task → select it by longname (`-bl`), never a bare `.robot` file — for `robotcode robot` and `robot-debug` alike.** The file holds other tests (all run) and skips the parent `__init__.robot` (setup/variables), so it behaves unlike a real run. Longname from `discover`/`results`; a whole suite → pass the *directory*.
+- **"Fix this test/task" / "why does it fail or not run?"** → read the recorded error first with `robotcode results` (`show --failed`, `log`) — it often names the cause; if not, debug the *actual* test with `robotcode robot-debug -bl "<longname>"` (longname rule above). Don't reconstruct it in a REPL or detour into external tools / an MCP probe first — that's a *different context* and chases the wrong cause.
 - **`robot-debug`/`repl` are interactive terminal sessions** — run them in a terminal and step through live, end with `.continue`/`.detach`/`.abort`; never start one and block on its exit (it waits forever). At `(rdb)`, `Ctrl-C`/`Ctrl-D` *resume* — use `.abort` to stop. (Missing `repl` extra → `Error: No such command 'robot-debug'`.)
 - "What tests/tags/suites exist?" — and any "which tests have tag X / are in suite Y" question — is answered with `robotcode discover`, never by reading or grepping `.robot` files. The effective set is resolved at runtime (paths, config, profiles, variables, pre-run modifiers); static sources don't show it.
