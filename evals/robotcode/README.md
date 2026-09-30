@@ -1,6 +1,6 @@
 # Evals for the `robotcode` skill
 
-Behavioral tests for the [`robotcode` skill](../../plugins/robotcode/skills/robotcode/). They don't check exact output — they check that an agent with the skill loaded **reaches for the right `robotcode` command** and avoids the habits the skill warns against (grepping `.robot` files, loading `output.xml`, writing a test for an exploratory task, guessing keyword args instead of using `libdoc`).
+Behavioral tests for the [`robotcode` skill](../../plugins/robotcode/skills/robotcode/). They don't check exact output — they check that an agent with the skill loaded **reaches for the right `robotcode` command** and avoids the habits the skill warns against (grepping `.robot` files, loading `output.xml`, writing a test for an exploratory task, guessing keyword args instead of using `robotcode doc`).
 
 Each case targets one behavior. They're ordered **simplest first** — from "just run it" through inventory and lookups to the debugger ("why does this fail?").
 
@@ -12,7 +12,7 @@ Each case targets one behavior. They're ordered **simplest first** — from "jus
 | 02 | results-summary | inspects a finished run with `results`, not raw `output.xml` |
 | 03 | results-diff | `results diff` baseline vs current to find the regression |
 | 04 | inventory-discover-not-grep | `discover`, never grep over `.robot` |
-| 05 | libdoc-first | `libdoc` before generic knowledge / web |
+| 05 | doc-first | `robotcode doc` before generic knowledge / web |
 | 06 | analyze-before-run | `analyze code` (static) before executing |
 | 07 | repl-explore-no-file | a "watch me" task in the REPL, no test file written |
 | 08 | debug-why-test-fails | debug the **actual** failing test with `robot-debug` — don't paste it into a REPL |

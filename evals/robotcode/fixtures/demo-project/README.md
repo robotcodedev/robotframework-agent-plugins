@@ -35,7 +35,7 @@ So the current run carries a **planted regression** against the passing baseline
 
 - **`Login Works` fails by default** — `${PASSWORD}` is wrong, so the backend returns `status=error` and the assertion on `tests/login.robot:25` fails, leaving a `${response}` dict in scope. The baseline run overrides `${PASSWORD}` so it passes. → results (`02`), diff (`03`), debugger (`08`, `09`).
 - **`smoke` tag** on `Login Works` and `Shipped Order Has Status Shipped`. → run-tests (`01`), discover (`04`).
-- **`Submit Order`** keyword in `orders.resource`. → libdoc (`05`), REPL-breakpoint (`10`).
+- **`Submit Order`** keyword in `orders.resource`. → doc (`05`), REPL-breakpoint (`10`).
 - **`checkout.robot` calls undefined `Finalize Checkout`** — a `KeywordNotFound` that `analyze code` reports without running anything. → analyze (`06`).
 
 ## Prerequisites
