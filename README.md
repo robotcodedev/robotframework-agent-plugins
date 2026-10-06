@@ -25,7 +25,7 @@ claude plugin marketplace add robotcodedev/robotframework-agent-plugins
 claude plugin install robotcode@robotframework-agent-plugins
 ```
 
-Update with `claude plugin marketplace update` once the marketplace is registered. See [Claude Code plugin docs](https://code.claude.com/docs/en/plugin-marketplaces) for version pinning (`@<ref>`) and uninstall.
+Update with `claude plugin marketplace update` once the marketplace is registered. To install a specific release, see [Versions and pinning](#versions-and-pinning).
 
 ### GitHub Copilot CLI
 
@@ -68,6 +68,23 @@ If your agent implements the Open Plugin spec but isn't listed above, the instal
 2. Install an individual plugin — `<tool> plugin install <plugin>@robotframework-agent-plugins`.
 
 Consult your agent's documentation for the exact command name and any required preview/beta flags.
+
+## Versions and pinning
+
+The `main` branch holds the released state of every plugin, so installing without a ref gives you the latest release. Development happens on the `next` branch.
+
+Every plugin release is tagged `<plugin>--v<version>`, for example `robotcode--v2.7.0`. To install a specific release, pin the marketplace to its tag:
+
+| Agent | Pin the marketplace to a tag |
+| --- | --- |
+| Claude Code | `claude plugin marketplace add robotcodedev/robotframework-agent-plugins#<tag>` |
+| GitHub Copilot CLI | `copilot plugin marketplace add robotcodedev/robotframework-agent-plugins#<tag>` |
+| GitHub Copilot Chat (VS Code) | `"chat.plugins.marketplaces": ["robotcodedev/robotframework-agent-plugins#<tag>"]` |
+| Codex | `codex plugin marketplace add robotcodedev/robotframework-agent-plugins --ref <tag>` |
+
+Then install the plugin as usual. A pinned marketplace stays on that release and receives no updates. To switch to another release, remove the marketplace, add it again with the new tag, and reinstall the plugin.
+
+To try unreleased changes, pin to `next` the same way.
 
 ## Repository layout
 
