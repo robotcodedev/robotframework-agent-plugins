@@ -196,14 +196,19 @@ The `robotcode` plugin is tied to the `robotcode` CLI: its `version` is always t
 This is a maintainer task. The plugin is released together with `robotcode`: the `robotcode` repository bundles a copy of the plugin and records the commit it was synced from in `chat-plugins/.upstream.json`. That commit becomes the release. Release every `robotcode` version this way, including patch releases without skill changes, so that each `robotcode` release has a matching tag.
 
 1. On `next`, set `version` in `plugins/robotcode/.plugin/plugin.json` and `metadata.version` in `plugins/robotcode/skills/robotcode/SKILL.md` to the new `robotcode` version, run `python scripts/sync_manifests.py`, then commit and push `next`.
-2. In the `robotcode` repository, sync the plugin with `python scripts/sync_chat_plugin.py` and publish the `robotcode` release `vX.Y.Z`.
-3. Back here, tag the synced commit and move `main` to it (assuming a `robotcode` checkout next to this repository):
+2. In the `robotcode` repository, sync the plugin with `hatch run build:sync-chat-plugin`, commit the result, and run `hatch run build:bump`. Before it commits, the bump checks that the plugin has the new version, matches this repository and was synced from a commit on `next`; after it, it tags that commit here as `robotcode--vX.Y.Z` and moves the local `main` to it, without pushing (this checkout must be next to the `robotcode` checkout).
+3. Push this repository together with the `robotcode` release, as the bump prints:
+   ```sh
+   git push origin main robotcode--vX.Y.Z
+   ```
+   The `robotcode` publish workflow publishes the release only after the tag and `main` are on GitHub. The push to `main` is always a fast-forward, because `main` only ever moves to commits from `next`.
+
+   If the preparation failed, rerun it with `hatch run build:prepare-chat-plugin-release X.Y.Z` in the `robotcode` repository, or tag and push by hand:
    ```sh
    SHA=$(git -C ../robotcode show vX.Y.Z:chat-plugins/.upstream.json | python -c "import json, sys; print(json.load(sys.stdin)['sha'])")
    git tag -s "robotcode--vX.Y.Z" "$SHA" -m "robotcode plugin for RobotCode X.Y.Z"
    git push origin "$SHA:refs/heads/main" "robotcode--vX.Y.Z"
    ```
-   The push to `main` is always a fast-forward, because `main` only ever moves to commits from `next`.
 
 #### Registering and Generating Manifests
 
