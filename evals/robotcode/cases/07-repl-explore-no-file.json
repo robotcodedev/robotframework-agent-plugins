@@ -5,12 +5,13 @@
   "query": "In this Robot Framework project, open a visible browser, go to https://example.com, and tell me the page title — I want to watch it happen.",
   "files": ["demo-project + a browser library installed (SeleniumLibrary or Browser, plus `rfbrowser init` for Browser)"],
   "expected_behavior": [
-    "Starts a REPL as a session (`robotcode session start repl`) and drives the task live, one `session send` per input — does NOT write a .robot test file",
-    "Opens the browser non-headless (e.g. `New Browser    headless=False`, or a visible `Open Browser`) so it can be watched, and keeps the session open",
-    "Reports the page title from the live session",
+    "Starts a REPL and drives the task live, one input at a time: as a session (`robotcode session start repl`, one `session send` per input), or at its prompt if its shell tool can write to a running command — does NOT write a .robot test file",
+    "Opens the browser non-headless (e.g. `New Browser    headless=False`, or a visible `Open Browser`) so it can be watched, and keeps the REPL open",
+    "Reports the page title from the live REPL",
     "Only offers to save it as a test afterwards, if asked"
   ],
-  "must_run": ["robotcode session start repl", "robotcode session send"],
+  "drive": "repl",
+  "must_run": [],
   "must_not_run": [],
   "must_not_create": ["\\.robot$"]
 }

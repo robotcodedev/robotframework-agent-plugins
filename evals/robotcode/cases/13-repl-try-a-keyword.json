@@ -1,0 +1,17 @@
+{
+  "skills": ["robotcode"],
+  "focus": "REPL — a plain \"try it out\" that names neither the REPL nor a session must still go to the REPL",
+  "query": "What does our `Submit Order` keyword do with an order id that doesn't exist? Try it out.",
+  "files": ["demo-project — orders.resource defines 'Submit Order', which fails for an unknown id"],
+  "expected_behavior": [
+    "Tries it live in a REPL, as a session or at the prompt if its shell tool can write to a running command",
+    "Does NOT write a throwaway .robot file and does NOT pipe a fixed list of inputs into `robotcode repl`",
+    "Reports what it saw: the keyword fails with `No order with id …`, and doesn't return anything",
+    "Ends a session with `session stop`, or says that it is still open and how to end it"
+  ],
+  "drive": "repl",
+  "must_run": [],
+  "must_not_run": [],
+  "must_not_create": ["\\.robot$"],
+  "must_answer": ["No order with id"]
+}

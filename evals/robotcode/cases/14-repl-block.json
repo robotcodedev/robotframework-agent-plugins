@@ -1,0 +1,17 @@
+{
+  "skills": ["robotcode"],
+  "focus": "REPL — a block goes in as a whole, with its END",
+  "query": "Open a REPL with our orders resource. In one FOR loop, look up the orders 42, 7 and 99 with `Submit Order`, and keep going when a lookup fails, so that at the end you can tell me which worked and which didn't. Close the REPL at the end.",
+  "files": ["demo-project — orders 42 and 7 exist, 99 doesn't"],
+  "expected_behavior": [
+    "Runs the REPL as a session, or at its prompt if its shell tool can write to a running command",
+    "Sends the whole `FOR` block with its `END` as one input, not line by line",
+    "Catches the failure inside the loop (`TRY` / `EXCEPT`, `Run Keyword And Ignore Error`) so the loop goes on",
+    "Reports that 42 and 7 worked and 99 didn't, and closes the REPL"
+  ],
+  "drive": "repl",
+  "must_run": [],
+  "must_not_run": ["session\\s+send\\s+\\S+\\s+['\"]*\\s*FOR\\b(?![\\s\\S]*\\bEND\\b)"],
+  "must_not_create": ["\\.robot$"],
+  "must_answer": ["\\b42\\b", "\\b7\\b", "\\b99\\b"]
+}

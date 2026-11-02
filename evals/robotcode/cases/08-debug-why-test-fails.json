@@ -4,14 +4,16 @@
   "query": "The 'Login Works' test keeps failing. Step through it and tell me what ${response} is at the point where it breaks.",
   "files": ["demo-project — tests/login.robot 'Login Works' fails on purpose, with a ${response} dict to inspect"],
   "expected_behavior": [
-    "Recognizes this as a live-debugging task and runs the test under the debugger with `robotcode session start debug` (not only reading the finished log with `results`)",
-    "Debugs the ACTUAL test in place, scoping the session to that one test by name (`-t \"Login Works\"` or `-bl \"<longname>\"`) rather than handing over the whole file (a bare path runs every test in login.robot and could pause on a different one) — and does NOT start a REPL to reconstruct or paste the test body into it",
+    "Recognizes this as a live-debugging task and runs the test under the debugger, as a session (`robotcode session start debug`) or at the prompt of `robotcode robot-debug` if its shell tool can write to a running command (not only reading the finished log with `results`)",
+    "Debugs the ACTUAL test in place, scoping the run to that one test by name (`-t \"Login Works\"` or `-bl \"<longname>\"`) rather than handing over the whole file (a bare path runs every test in login.robot and could pause on a different one) — and does NOT start a REPL to reconstruct or paste the test",
     "Inspects the value at the stop — e.g. `.print ${response}` / `.vars` — rather than guessing",
-    "Steps through it one `session send` at a time (stop → `.where` / `.vars` / `.print` → choose the next command) and ends the session with `session stop`, or says that it is still open and how to end it; does not start a bare `robot-debug` and block waiting for exit",
+    "Steps through it one input at a time (stop → `.where` / `.vars` / `.print` → choose the next command) and ends a session with `session stop`, or says that it is still open and how to end it; does not start a bare `robot-debug` and block waiting for exit",
     "Stays in the test's own context — does NOT detour into external tools (a separate browser / SUT session, an MCP probe) or generic exploration to diagnose it",
     "Does NOT write a new .robot file to reproduce the failure"
   ],
-  "must_run": ["robotcode session start debug\\b[^\\n]*\\s(-t|--test|-bl|--by-longname)[ =]", "robotcode session send"],
-  "must_not_run": ["robotcode repl\\b", "robotcode session start repl", "\\bcat\\b[^|]*output\\.xml", "xmllint"],
-  "must_not_create": ["\\.robot$"]
+  "drive": "debug",
+  "must_run": ["robotcode\\b[^\\n]*(session start debug|robot-debug)\\b[^\\n]*\\s(-t|--test|-bl|--by-longname)[ =]"],
+  "must_not_run": ["\\brobotcode repl\\b", "robotcode session start repl", "\\bcat\\b[^|]*output\\.xml", "xmllint"],
+  "must_not_create": ["\\.robot$"],
+  "must_answer": ["invalid credentials"]
 }

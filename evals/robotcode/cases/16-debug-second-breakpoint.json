@@ -1,0 +1,17 @@
+{
+  "skills": ["robotcode"],
+  "focus": "debugger — a breakpoint set during the run, and the whole suite that was asked for",
+  "query": "Run the order tests in the debugger and stop at line 10 of tests/orders.robot. Show me the variables at that stop, then set a second breakpoint at line 25 of orders.resource, continue to it, continue to the next stop, and let the run go to the end. Look at each stop before you send the next command.",
+  "files": ["demo-project — tests/orders.robot:10 is in the first test; orders.resource:25 is the `Should Be Equal` that the first two tests reach"],
+  "expected_behavior": [
+    "Runs the whole order suite under the debugger, selected by its longname (`-bl Tests.Orders`), not only one of its tests and not by the .robot file",
+    "Sets the second breakpoint with `.break` during the run, in an input of its own",
+    "Goes one stop at a time and reads each answer before the next command",
+    "Reports both tests that reach the second breakpoint, that all three tests pass, and ends a session with `session stop`, or says that it is still open and how to end it"
+  ],
+  "drive": "debug",
+  "must_run": ["robotcode\\b[^\\n]*(session start debug|robot-debug)\\b[^\\n]*--break[ =]\\S*orders\\.robot:10"],
+  "must_not_run": ["(session start debug|robot-debug)\\b[^\\n]*Tests\\.Orders\\.[A-Z]"],
+  "must_not_create": ["\\.robot$"],
+  "must_answer": ["pass"]
+}

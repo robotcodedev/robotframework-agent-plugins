@@ -4,12 +4,14 @@
   "query": "In a robotcode REPL, set a breakpoint on the 'Submit Order' keyword, then run it and show me the call stack when it stops.",
   "files": ["demo-project — orders.resource defines the 'Submit Order' keyword"],
   "expected_behavior": [
-    "Runs the REPL as a session and attaches the debugger — `.debug on` and `.break \"Submit Order\"` in a `session send` each (or `robotcode session start repl --break \"Submit Order\"`)",
+    "Runs the REPL as a session, or at its prompt if its shell tool can write to a running command, and attaches the debugger — `.debug on` and `.break \"Submit Order\"` one at a time (or `--break \"Submit Order\"` at the start)",
     "Runs the keyword so the breakpoint is hit, then shows the stack with `.where`",
-    "Leaves the stop cleanly (`.continue` / `.detach` / `.abort`) and ends the session with `session stop`, or says that it is still open and how to end it — does not hang",
+    "Leaves the stop cleanly (`.continue` / `.detach` / `.abort`) and ends a session with `session stop`, or says that it is still open and how to end it — does not hang",
     "Does not write a .robot file just to host the keyword call"
   ],
-  "must_run": ["robotcode session start repl", "robotcode session send"],
+  "drive": "repl",
+  "must_run": [],
   "must_not_run": [],
-  "must_not_create": ["\\.robot$"]
+  "must_not_create": ["\\.robot$"],
+  "must_answer": ["Submit Order"]
 }

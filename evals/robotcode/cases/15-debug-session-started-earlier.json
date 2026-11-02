@@ -1,0 +1,20 @@
+{
+  "skills": ["robotcode"],
+  "focus": "sessions — a debug session someone started earlier: find it, read its result, run it again",
+  "prepare": [
+    "id=$(robotcode session start debug --break tests/login.robot:25 -bl 'Tests.Login.Login Works' | sed -n 's/^Started session \\(.*\\)\\.$/\\1/p')",
+    "for _ in 1 2 3 4 5; do [ \"$(robotcode session status \"$id\")\" = ended ] && break; robotcode session send \"$id\" .continue; done"
+  ],
+  "query": "I started a debug session for the 'Login Works' test earlier; it should be listed as open. Find out whether its run has ended and with which exit code. Then run it again from the start, in the same session with the same breakpoints, and tell me where it stops first. End the session at the end.",
+  "files": ["demo-project — the case opens the session before the agent starts; its run has ended with one failed test"],
+  "expected_behavior": [
+    "Finds the session with `robotcode session list` instead of starting a new one",
+    "Gets the end of the run with `session status` and its exit code with `session result`: 1",
+    "Runs it again with `session restart`, keeping the breakpoint, and reports the stop at tests/login.robot:25",
+    "Ends it with `session stop`"
+  ],
+  "must_run": ["session\\s+list", "session\\s+(status|result)", "session\\s+restart", "session\\s+stop"],
+  "must_not_run": ["session\\s+start"],
+  "must_not_create": ["\\.robot$"],
+  "must_answer": ["login\\.robot:25"]
+}
