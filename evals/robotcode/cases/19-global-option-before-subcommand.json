@@ -1,0 +1,15 @@
+{
+  "skills": ["robotcode"],
+  "focus": "global options — a profile goes before the subcommand",
+  "query": "Run the smoke tests with our ci profile.",
+  "files": ["demo-project — robot.toml defines the profile `ci`"],
+  "expected_behavior": [
+    "Runs `robotcode --profile ci robot -i smoke` (or `-p ci`), with the profile before the subcommand",
+    "Doesn't try `robotcode robot --profile ci` first",
+    "Reports the counts, then the failing test"
+  ],
+  "must_run": ["robotcode\\s+(-p|--profile)[ =]\\S+\\s+(robot|run)\\b"],
+  "must_not_run": ["robotcode\\s+(robot|run)\\b[^\\n]*\\s(-p|--profile)\\b"],
+  "must_not_create": [],
+  "must_answer": ["\\b1\\b"]
+}

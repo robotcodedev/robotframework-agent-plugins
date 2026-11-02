@@ -1,0 +1,15 @@
+{
+  "skills": ["robotcode"],
+  "focus": "selection — one test by its longname, not by handing over the .robot file",
+  "query": "Run only the 'Login Works' test.",
+  "files": ["demo-project — 'Login Works' in tests/login.robot, which also holds another test"],
+  "expected_behavior": [
+    "Takes the longname from `robotcode discover` and runs `robotcode robot -bl \"Tests.Login.Login Works\"`",
+    "Does NOT hand over tests/login.robot: a single file becomes the top suite and skips the parent suites' `__init__.robot`",
+    "Reports that the test fails, with the reason"
+  ],
+  "must_run": ["robotcode\\b[^\\n]*\\b(robot|run)\\b[^\\n]*\\s(-bl|--by-longname|-t|--test)[ =]"],
+  "must_not_run": ["robotcode\\b[^\\n]*\\b(robot|run)\\b[^\\n]*\\.robot\\b"],
+  "must_not_create": ["\\.robot$"],
+  "must_answer": ["fail"]
+}

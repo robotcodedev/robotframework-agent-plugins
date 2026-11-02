@@ -8,3 +8,6 @@ python-path = ["libs"]
 # Keep run artifacts in results/ (gitignored). `robotcode results` auto-discovers
 # the output file from this setting, so the results/diff cases just work after setup.sh.
 output-dir = "results"
+
+[profiles.ci]
+output-dir = "results/ci"

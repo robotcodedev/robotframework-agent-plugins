@@ -9,6 +9,6 @@
     "Leads the answer with headline counts (X passed, Y failed, Z skipped), then a one-line reason per failure"
   ],
   "must_run": ["robotcode results"],
-  "must_not_run": ["\\b(cat|less|head|tail|grep|rg)\\b[^|]*output\\.xml", "xmllint"],
+  "must_not_run": ["\\b(cat|less|head|tail|grep|rg)\\b[^|;&\\n]*output\\.xml", "xmllint"],
   "must_not_create": []
 }

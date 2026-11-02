@@ -9,6 +9,6 @@
     "Reports the matching tests (or that there are none)"
   ],
   "must_run": ["robotcode discover"],
-  "must_not_run": ["\\b(grep|rg|ag)\\b[^|]*\\.robot", "\\bfind\\b[^|]*-name[^|]*\\.robot"],
+  "must_not_run": ["\\b(grep|rg|ag)\\b[^|;&\\n]*\\.robot", "\\bfind\\b[^|;&\\n]*-name[^|;&\\n]*\\.robot"],
   "must_not_create": []
 }

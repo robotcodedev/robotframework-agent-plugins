@@ -25,6 +25,8 @@ Each case targets one behavior. They're ordered **simplest first** — from "jus
 | 15 | debug-session-started-earlier | finds a session that is already open, reads its result and restarts it |
 | 16 | debug-second-breakpoint | the whole suite under the debugger, with a breakpoint set during the run |
 | 17 | session-in-own-sandbox | where each command has a sandbox of its own, the agent stays inside it and says what it could do |
+| 18 | run-one-test-by-longname | one test by its longname, not by handing over the `.robot` file |
+| 19 | global-option-before-subcommand | a profile goes before the subcommand |
 
 (`02`, `03` and `12` need finished runs, which `./setup.sh` makes; the harness runs it in each copy of the fixture. `07` needs a browser library — see the [fixture README](fixtures/demo-project/README.md).)
 

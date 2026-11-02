@@ -13,7 +13,7 @@
   ],
   "drive": "debug",
   "must_run": ["robotcode\\b[^\\n]*(session start debug|robot-debug)\\b[^\\n]*\\s(-t|--test|-bl|--by-longname)[ =]"],
-  "must_not_run": ["\\brobotcode repl\\b", "robotcode session start repl", "\\bcat\\b[^|]*output\\.xml", "xmllint"],
+  "must_not_run": ["\\brobotcode repl\\b", "robotcode session start repl", "\\bcat\\b[^|;&\\n]*output\\.xml", "xmllint"],
   "must_not_create": ["\\.robot$"],
   "must_answer": ["invalid credentials"]
 }
