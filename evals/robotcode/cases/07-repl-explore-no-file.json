@@ -1,7 +1,7 @@
 {
   "skills": ["robotcode"],
   "focus": "REPL — an exploratory 'watch me' task must NOT become a written .robot test",
-  "requires": "a browser library (SeleniumLibrary or Browser) installed in the project — the only non-offline case; without it the agent should still pick the REPL, but can't actually open a browser",
+  "requires": "a browser library (SeleniumLibrary or Browser) installed in the project; without it the agent should still pick the REPL, but can't actually open a browser",
   "query": "In this Robot Framework project, open a visible browser, go to https://example.com, and tell me the page title — I want to watch it happen.",
   "files": ["demo-project + a browser library installed (SeleniumLibrary or Browser, plus `rfbrowser init` for Browser)"],
   "expected_behavior": [

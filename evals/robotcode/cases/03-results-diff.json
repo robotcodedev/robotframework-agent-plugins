@@ -9,6 +9,6 @@
     "Reports the regression plainly; does not dump XML"
   ],
   "must_run": ["robotcode results diff"],
-  "must_not_run": ["\\b(cat|less|grep|rg)\\b[^|;&\\n]*\\.xml", "xmllint"],
+  "must_not_run": ["\\b(cat|less|grep|rg)\\b(?![^|;&\\n]*--files)[^|;&\\n]*\\.xml", "xmllint"],
   "must_not_create": []
 }

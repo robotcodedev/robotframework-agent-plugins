@@ -234,18 +234,22 @@ class Codex:
 
     def parse(self, events):
         t = Transcript()
+        seen = set()
         for ev in events:
             if ev.get("type") == "error":
                 t.error = str(ev.get("message"))
-            if ev.get("type") != "item.completed":
-                continue
             item = ev.get("item", {})
-            if item.get("type") == "agent_message":
-                t.final = item.get("text", "")
-            elif item.get("type") == "command_execution":
-                t.commands.append(item.get("command", ""))
+            # A command that still runs when the agent ends, like a debugger left at a stop, has no "completed".
+            if ev.get("type") in ("item.started", "item.completed") and item.get("type") == "command_execution":
+                if item.get("id") not in seen:
+                    seen.add(item.get("id"))
+                    t.commands.append(item.get("command", ""))
                 if SKILL_FILE in item.get("command", ""):
                     t.skill_loaded = True
+            if ev.get("type") != "item.completed":
+                continue
+            if item.get("type") == "agent_message":
+                t.final = item.get("text", "")
             elif item.get("type") == "file_change":
                 t.written += [c.get("path", "") for c in item.get("changes", [])]
         return t
@@ -273,7 +277,7 @@ class OpenCode:
     def writable(self, env):
         # Its login lies in its data folder, so the runs show up in the user's list of sessions.
         home = Path.home()
-        return [home / folder / "opencode" for folder in (".local/share", ".cache", ".local/state")]
+        return [home / folder / "opencode" for folder in (".local/share", ".cache", ".local/state", ".config")]
 
     def parse(self, events):
         t = Transcript()
@@ -326,13 +330,30 @@ def copy_project(source, project, env):
     subprocess.run([*git, "commit", "--quiet", "-m", "The project"], cwd=project, capture_output=True, check=False)
 
 
+def needed_from_home(env):
+    """What in the home folder runs the agent and robotcode: the PATH and the environment's interpreter."""
+    paths = [os.path.normpath(p) for p in env.get("PATH", "").split(os.pathsep)]
+    if env.get("VIRTUAL_ENV"):
+        python = Path(env["VIRTUAL_ENV"]) / "bin" / "python"
+        while python.is_symlink():
+            python = python.parent / os.readlink(python)
+        # Under the name its link uses, which can be a link to a folder itself, and the real one.
+        paths += [str(python.parents[1]), str(python.resolve().parents[1])]
+    return [p for p in dict.fromkeys(paths) if Path(p).is_relative_to(Path.home()) and Path(p).exists()]
+
+
 def around_whole_agent(agent, run, env):
-    """One sandbox around the whole agent: a private /tmp and runtime folder, little else writable."""
+    """One sandbox around the whole agent: a private /tmp, home and runtime folder, little else visible."""
+    # With its questions off an agent reads what it likes, and what it reads goes to its model.
     wrap = ["bwrap", "--ro-bind", "/", "/", "--dev", "/dev", "--proc", "/proc", "--tmpfs", "/tmp"]
-    for path in (run.plugin_dir, env.get("VIRTUAL_ENV")):
+    wrap += ["--tmpfs", str(Path.home())]
+    # The other runs stay out of sight: an agent that looks around would read their transcripts.
+    wrap += ["--tmpfs", str(run.out_dir)]
+    for path in (run.plugin_dir, env.get("VIRTUAL_ENV"), *needed_from_home(env), *run.add_dirs):
         if path:
             wrap += ["--ro-bind", str(path), str(path)]
-    wrap += ["--bind", str(run.out_dir), str(run.out_dir)]
+    for path in (run.project, env["XDG_CONFIG_HOME"]):
+        wrap += ["--bind", str(path), str(path)]
     for path in agent.writable(env):
         if path.exists():
             wrap += ["--bind", str(path), str(path)]
@@ -410,7 +431,7 @@ FED = re.compile(r"\|\s*(?:timeout\s+\S+\s+)?(?:\S*/)?robotcode\b|<<|\brobotcode
 SEND = re.compile(r"""session\s+send\s+\S+\s+(?:'((?:[^']|'\\'')*)'|"((?:[^"\\]|\\.)*)")""")
 STEP = re.compile(r"\s*\.(next|n|step|s|continue|c|return|r|until)\b")
 SEND_IN_LOOP = re.compile(r"\bfor\b[^\n]*;\s*do\b[^\n]*session\s+send")
-STILL_OPEN = re.compile(r"\b(still|stays?|remains?) open\b", re.IGNORECASE)
+STILL_OPEN = re.compile(r"\b((still|stays?|remains?) open|(still |is |been |remains? |stays? )paused)\b", re.IGNORECASE)
 
 
 def check_driving(kind, t, agent):
@@ -461,7 +482,9 @@ def run_once(case_path, case, spec, n, args, out_dir):
     sandbox = case.get("sandbox") or args.sandbox
     if sandbox == "own" and not agent.has_own_sandbox:
         return [], f"{agent.binary} has no sandbox of its own", Transcript()
-    run = Run(case["query"], model, args.plugin_dir, sandbox, args.allow_all, args.add_dir, project, out_dir)
+    # Haiku hardly loads the skill by itself, so its users are told to name it.
+    query = f"Use the robotcode skill. {case['query']}" if "haiku" in model else case["query"]
+    run = Run(query, model, args.plugin_dir, sandbox, args.allow_all, args.add_dir, project, out_dir)
     binary = shutil.which(agent.binary, path=env.get("PATH"))
     if not binary:
         return [], f"{agent.binary} is not on PATH", Transcript()
@@ -484,7 +507,8 @@ def run_once(case_path, case, spec, n, args, out_dir):
     if not args.keep:
         shutil.rmtree(project, ignore_errors=True)
 
-    if t.error and not t.commands:
+    if t.error:
+        # Not logged in, out of credits: says nothing about the skill, even if the session had begun.
         return [], t.error, t
     if not t.commands and not t.final:
         stderr = (run_dir / "stderr.txt").read_text(errors="replace").strip()
@@ -494,8 +518,6 @@ def run_once(case_path, case, spec, n, args, out_dir):
         failures.append("the skill wasn't loaded")
     if case.get("drive"):
         failures += check_driving(case["drive"], t, agent)
-    if t.error:
-        failures.append(f"ended with an error: {t.error}")
     if timed_out:
         failures.append(f"timed out after {args.timeout} s")
     return failures, "", t
@@ -519,8 +541,9 @@ def main():
                     help="turn the agent's questions off with --sandbox none; only on a disposable machine")
     ap.add_argument("--venv", help="the environment with robotcode, if it isn't on PATH")
     ap.add_argument("--add-dir", action="append", default=[],
-                    help="a folder the agent's own sandbox must see, for Copilot's --sandbox "
-                         "(e.g. the Python installation)")
+                    help="a folder a sandbox must show: for Copilot's --sandbox the Python installation, "
+                         "for the whole sandbox what the environment needs from the home folder "
+                         "(e.g. the sources of an editable install)")
     ap.add_argument("--timeout", type=int, default=300, help="per-run timeout (s)")
     ap.add_argument("--plugin-dir", help="load the plugin from this folder, to test a skill that is not released")
     ap.add_argument("--out", help="folder for the transcripts (default: a new temporary folder)")

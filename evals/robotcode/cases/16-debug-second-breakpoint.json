@@ -11,7 +11,7 @@
   ],
   "drive": "debug",
   "must_run": ["robotcode\\b[^\\n]*(session start debug|robot-debug)\\b[^\\n]*--break[ =]\\S*orders\\.robot:10"],
-  "must_not_run": ["(session start debug|robot-debug)\\b[^\\n]*Tests\\.Orders\\.[A-Z]"],
+  "must_not_run": ["(session start debug|robot-debug)\\b[^\\n]*Tests\\.Orders\\.[A-Z]", "(session start debug|robot-debug)\\b[^\\n]*\\s\\S+\\.robot(\\s|$)"],
   "must_not_create": ["\\.robot$"],
   "must_answer": ["pass"]
 }

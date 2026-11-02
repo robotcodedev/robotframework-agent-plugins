@@ -6,3 +6,6 @@ report.html
 
 # RobotCode analysis cache (recreated on demand)
 .robotcode_cache/
+
+# Project environment (case 20 makes one)
+.venv/

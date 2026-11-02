@@ -27,6 +27,7 @@ Each case targets one behavior. They're ordered **simplest first** — from "jus
 | 17 | session-in-own-sandbox | where each command has a sandbox of its own, the agent stays inside it and says what it could do |
 | 18 | run-one-test-by-longname | one test by its longname, not by handing over the `.robot` file |
 | 19 | global-option-before-subcommand | a profile goes before the subcommand |
+| 20 | missing-extra-asks-first | `No such command`: asks before installing the extra |
 
 (`02`, `03` and `12` need finished runs, which `./setup.sh` makes; the harness runs it in each copy of the fixture. `07` needs a browser library — see the [fixture README](fixtures/demo-project/README.md).)
 
@@ -95,9 +96,11 @@ At the end it prints a table of how many runs of each case and agent passed; `1E
 
 | `--sandbox` | What it means |
 | --- | --- |
-| `whole` | One [bubblewrap](https://github.com/containers/bubblewrap) sandbox around the agent, the default where `bwrap` exists: a private `/tmp` and runtime folder, and only the run's folder and the agent's own configuration writable. All of the agent's questions are off, and sessions work. Each run is apart from the others, so `--jobs` works. |
+| `whole` | One [bubblewrap](https://github.com/containers/bubblewrap) sandbox around the agent, the default where `bwrap` exists: a private `/tmp`, home and runtime folder. All of the agent's questions are off, and sessions work. Each run is apart from the others, so `--jobs` works. |
 | `own` | The agent's own sandbox for each command (Claude Code's `sandbox` setting, Copilot's `--sandbox`, Codex's `workspace-write`), where a session can't outlive its command. Copilot's needs `--add-dir` for the Python installation. opencode has none, so these runs count as `1E`. |
 | `none` | No sandbox, for a system without `bwrap`. Add `--allow-all` to turn the agent's questions off, only on a disposable machine. |
+
+With its questions off an agent reads what it likes, and what it reads goes to its model. So in `whole` it sees of your home folder only the agent's own configuration, the folders on `PATH`, the environment of `--venv` with its interpreter and what `--add-dir` names; only the configuration and its copy of the project are writable, and the other runs are out of sight. Name anything else the environment needs with `--add-dir`, such as the sources of an editable install. The configuration stays visible with its history of sessions, because the login lies there: give the agent one of its own (`CLAUDE_CONFIG_DIR`, `CODEX_HOME`, `COPILOT_HOME`) if that matters. In `own` and `none` nothing of this holds.
 
 **The way, with `drive`.** A right answer can come from a wrong way, so a case with `drive` also fails if the agent:
 
@@ -111,7 +114,7 @@ At the end it prints a table of how many runs of each case and agent passed; `1E
 
 - The CLIs of the agents you name on `PATH` and logged in. A run costs what a session of that agent costs, and Codex's take a few minutes each. Set `CLAUDE_CONFIG_DIR` to run Claude Code with a configuration of its own.
 - `robotcode` installed (`pip install robotcode[all]`) and on `PATH`, or its environment given with `--venv`. The bundled fixture needs nothing else and runs offline.
-- **Case 07** needs a browser library installed (SeleniumLibrary or Browser) — the only non-offline case.
+- **Case 07** needs a browser library installed (SeleniumLibrary or Browser), and **case 20** downloads `robotcode[runner]` from PyPI into its copy of the project. All others run offline.
 
 ### 3. Add an LLM judge (optional)
 
@@ -121,6 +124,7 @@ The harness only grades the objective checks. For the `expected_behavior` rubric
 
 - **Regex checks are necessary, not sufficient.** They confirm the agent reached for the right command; the rubric covers the rest (did it report counts first? step through the debugger interactively and resume? avoid hanging?).
 - **Test across models and agents.** The guide recommends Haiku, Sonnet, and Opus — a skill that works on Opus may need more guidance for Haiku. One run says little: compare several with `--repeat`.
+- **A Haiku model gets the skill named.** It hardly loads the skill by itself, so RobotCode's guide tells its users to name it, and the harness starts its prompts with *Use the robotcode skill.* Its runs say how well it follows the skill, not whether it finds it.
 - **The transcript of Codex hides what it writes to a running command.** It shows `robotcode repl`, not the inputs that follow, so going one input at a time can only be checked in a session.
 - **Evals are the source of truth for changes.** When you edit the skill, re-run the affected cases and compare; add a new case whenever you find a behavior the skill should enforce but doesn't.
 

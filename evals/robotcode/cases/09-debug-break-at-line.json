@@ -13,5 +13,5 @@
   "must_run": ["robotcode\\b[^\\n]*(session start debug|robot-debug)\\b[^\\n]*--break[ =]\\S*login\\.robot:25"],
   "must_not_run": [],
   "must_not_create": ["\\.robot$"],
-  "must_answer": ["\\$\\{response\\}"]
+  "must_answer": ["[$&]\\{response\\}"]
 }

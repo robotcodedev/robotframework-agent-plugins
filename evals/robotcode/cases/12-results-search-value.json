@@ -9,6 +9,6 @@
     "Names the test that did it"
   ],
   "must_run": ["robotcode results\\b[^\\n]*--search"],
-  "must_not_run": ["\\b(cat|less|grep|rg)\\b[^|;&\\n]*\\.xml", "xmllint"],
+  "must_not_run": ["\\b(cat|less|grep|rg)\\b(?![^|;&\\n]*--files)[^|;&\\n]*\\.xml", "xmllint"],
   "must_not_create": ["\\.robot$"]
 }
