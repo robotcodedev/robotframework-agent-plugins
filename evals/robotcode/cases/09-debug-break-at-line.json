@@ -4,12 +4,12 @@
   "query": "Pause execution at tests/login.robot line 25 (the failing assertion in 'Login Works') and show me the variables in scope at that point.",
   "files": ["demo-project/tests/login.robot — line 25 is the `Should Be Equal ${response}[status] ok` assertion"],
   "expected_behavior": [
-    "Uses `robotcode robot-debug` with a line breakpoint (`--break tests/login.robot:25`)",
+    "Uses `robotcode session start debug` with a line breakpoint (`--break tests/login.robot:25`)",
     "Scopes the run to the one test (`-t \"Login Works\"` / `-bl`) alongside the line breakpoint, so only that test executes and the stop lands in it — rather than running the whole file",
     "Captures the in-scope variables at the stop (`.vars`, optionally `--user`) — including the ${response} dict",
-    "Steps through it interactively and ends with a resuming command so the run completes"
+    "Steps through it one `session send` at a time and ends the session with `session stop`, or says that it is still open and how to end it"
   ],
-  "must_run": ["robotcode (robot-debug|run-debug)", "--break[ =]\\S*login\\.robot:25"],
+  "must_run": ["robotcode session start debug\\b[^\\n]*--break[ =]\\S*login\\.robot:25", "robotcode session send"],
   "must_not_run": [],
   "must_not_create": ["\\.robot$"]
 }

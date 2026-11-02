@@ -1,0 +1,13 @@
+{
+  "skills": ["robotcode"],
+  "focus": "names of suites — the top suite is named after `paths`, not after the project's folder",
+  "query": "Run only the orders suite.",
+  "files": ["demo-project — robot.toml has paths = [\"tests\"], so the suite is Tests.Orders"],
+  "expected_behavior": [
+    "Runs the suite through `robotcode robot`, selected by a name from `robotcode discover suites` (`-bl \"Tests.Orders\"`, `-s Tests.Orders`) rather than by the .robot file",
+    "Does NOT guess the name from the project's folder (`Demo-Project.Orders`)"
+  ],
+  "must_run": ["robotcode robot\\b[^\\n]*\\s(-s|--suite|-bl|--by-longname)[ =]"],
+  "must_not_run": ["\\s(-s|--suite|-bl|--by-longname)[ =][\"']?demo"],
+  "must_not_create": ["\\.robot$"]
+}

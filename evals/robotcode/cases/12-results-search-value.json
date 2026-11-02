@@ -1,0 +1,14 @@
+{
+  "skills": ["robotcode"],
+  "focus": "whether a value occurred in a finished run — `results log --search`, never grep on output.xml",
+  "query": "Did the last run check an order for the status shipped? Which test did that?",
+  "files": ["demo-project — run ./setup.sh first: tests/orders.robot passes `shipped` to a keyword in the run behind results/output.xml"],
+  "expected_behavior": [
+    "Uses `robotcode results log --search shipped` (or `show` / `summary` with `--search`) on the finished run",
+    "Does NOT cat / grep / xmllint output.xml, and does not answer only from the .robot files",
+    "Names the test that did it"
+  ],
+  "must_run": ["robotcode results\\b[^\\n]*--search"],
+  "must_not_run": ["\\b(cat|less|grep|rg)\\b[^|]*\\.xml", "xmllint"],
+  "must_not_create": ["\\.robot$"]
+}

@@ -19,7 +19,8 @@ Usage:
     ./run.py --project /path/to/robot-project [--case 01] [--model sonnet] [--allow-all]
 
 The skill must be available to the `claude` CLI in that project (install the
-plugin from the marketplace, or run where it is already loaded). `--allow-all`
+plugin from the marketplace, run where it is already loaded, or load a folder
+with `--plugin-dir`, to test a skill that is not released). `--allow-all`
 adds `--dangerously-skip-permissions` so bash isn't gated — only do that against
 a disposable fixture project. Cases that name a fixture under `files` need that
 fixture to exist in the project (or adapt the query).
@@ -42,13 +43,15 @@ GREEN, RED, YELLOW, DIM, BOLD, RESET = (
 )
 
 
-def run_claude(query, project, model, allow_all, timeout):
+def run_claude(query, project, model, allow_all, timeout, plugin_dir):
     """Run one headless Claude Code session; return the stream-json lines (list of dicts)."""
     cmd = ["claude", "-p", query, "--output-format", "stream-json", "--verbose"]
     if model:
         cmd += ["--model", model]
     if allow_all:
         cmd += ["--dangerously-skip-permissions"]
+    if plugin_dir:
+        cmd += ["--plugin-dir", plugin_dir]
     try:
         proc = subprocess.run(
             cmd, cwd=project, capture_output=True, text=True, timeout=timeout
@@ -118,7 +121,10 @@ def main():
     ap.add_argument("--model", help="claude model (e.g. haiku, sonnet, opus) — test all three")
     ap.add_argument("--allow-all", action="store_true", help="add --dangerously-skip-permissions")
     ap.add_argument("--timeout", type=int, default=300, help="per-case timeout (s)")
+    ap.add_argument("--plugin-dir", help="load the plugin from this folder, to test a skill that is not released")
     args = ap.parse_args()
+
+    plugin_dir = str(Path(args.plugin_dir).resolve()) if args.plugin_dir else None
 
     cases = sorted(CASES_DIR.glob("*.json"))
     if args.case:
@@ -134,7 +140,7 @@ def main():
         print(f"  query: {case['query']}")
 
         events, err = run_claude(
-            case["query"], args.project, args.model, args.allow_all, args.timeout
+            case["query"], args.project, args.model, args.allow_all, args.timeout, plugin_dir
         )
         if events is None:
             print(f"  {RED}ERROR{RESET} could not run session: {err}")

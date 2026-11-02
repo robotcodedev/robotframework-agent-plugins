@@ -14,12 +14,14 @@ Each case targets one behavior. They're ordered **simplest first** — from "jus
 | 04 | inventory-discover-not-grep | `discover`, never grep over `.robot` |
 | 05 | doc-first | `robotcode doc` before generic knowledge / web |
 | 06 | analyze-before-run | `analyze code` (static) before executing |
-| 07 | repl-explore-no-file | a "watch me" task in the REPL, no test file written |
-| 08 | debug-why-test-fails | debug the **actual** failing test with `robot-debug` — don't paste it into a REPL |
-| 09 | debug-break-at-line | line breakpoint + inspect variables in scope |
-| 10 | repl-interactive-breakpoint | break into a keyword you build at the REPL prompt |
+| 07 | repl-explore-no-file | a "watch me" task in a REPL session, no test file written |
+| 08 | debug-why-test-fails | debug the **actual** failing test in a debug session — don't paste it into a REPL |
+| 09 | debug-break-at-line | line breakpoint + inspect variables in scope, in a debug session |
+| 10 | repl-interactive-breakpoint | break into a keyword you build in a REPL session |
+| 11 | suite-name-from-paths | selects a suite by a name from `discover`, not by the project's folder |
+| 12 | results-search-value | `results log --search` for whether a value occurred, not grep on `output.xml` |
 
-(`02` and `03` need `./setup.sh` run first; `07` needs a browser library — see the [fixture README](fixtures/demo-project/README.md).)
+(`02`, `03` and `12` need `./setup.sh` run first; `07` needs a browser library — see the [fixture README](fixtures/demo-project/README.md).)
 
 ## How an eval is shaped
 
@@ -31,7 +33,7 @@ One JSON file per case in [`cases/`](cases/). The first three fields are the sta
 | `query` | The user request to send the agent. |
 | `files` | Fixtures the case assumes exist in the project (informational — you provide them). |
 | `expected_behavior` | Free-text rubric — **judged by you or an LLM**, not by the harness. |
-| `must_run` | Regexes that **should** match a command the agent ran (e.g. `robotcode (robot-debug\|run-debug)`). |
+| `must_run` | Regexes that **should** match a command the agent ran (e.g. `robotcode session start debug`). |
 | `must_not_run` | Regexes that must **not** match any command (e.g. `cat …output\.xml`). |
 | `must_not_create` | Regexes on written file paths that must **not** match (e.g. `\.robot$`). |
 
@@ -72,10 +74,10 @@ cd evals/robotcode
 
 **Prerequisites**
 
-- `claude` CLI on `PATH`, with the **robotcode skill available** to it (install the plugin — see the [marketplace README](../../README.md) — or run where it is already loaded).
+- `claude` CLI on `PATH`, with the **robotcode skill available** to it (install the plugin — see the [marketplace README](../../README.md) — or run where it is already loaded). To test your working copy, pass `--plugin-dir ../../plugins/robotcode`, and turn an installed copy of the plugin off in the project.
 - `robotcode` installed in the target project's environment (`pip install robotcode[all]`). The bundled fixture needs nothing else and runs offline.
 - `--allow-all` adds `--dangerously-skip-permissions` so bash isn't gated — fine for the throwaway fixture; be careful pointing `--project` at a real project, since the harness really executes the commands the agent chooses.
-- **Cases 02 and 03** (results, diff) need finished runs — run `fixtures/demo-project/setup.sh` first. **Case 07** needs a browser library installed (SeleniumLibrary or Browser) — the only non-offline case.
+- **Cases 02, 03 and 12** (results, diff, search) need finished runs — run `fixtures/demo-project/setup.sh` first. **Case 07** needs a browser library installed (SeleniumLibrary or Browser) — the only non-offline case.
 
 ### 3. Add an LLM judge (optional)
 
