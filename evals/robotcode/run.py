@@ -476,14 +476,14 @@ def run_once(case_path, case, spec, n, args, out_dir):
     if not shutil.which("robotcode", path=env.get("PATH")):
         return [], "robotcode is not on PATH; activate its environment or use --venv", Transcript()
     copy_project(args.project, project, env)
-    if args.plugin_dir:
+    if args.plugin_dir or args.no_skill:
         agent.install_skill(project, args.plugin_dir)
 
     sandbox = case.get("sandbox") or args.sandbox
     if sandbox == "own" and not agent.has_own_sandbox:
         return [], f"{agent.binary} has no sandbox of its own", Transcript()
     # Haiku hardly loads the skill by itself, so its users are told to name it.
-    query = f"Use the robotcode skill. {case['query']}" if "haiku" in model else case["query"]
+    query = f"Use the robotcode skill. {case['query']}" if "haiku" in model and case.get("skills") else case["query"]
     run = Run(query, model, args.plugin_dir, sandbox, args.allow_all, args.add_dir, project, out_dir)
     binary = shutil.which(agent.binary, path=env.get("PATH"))
     if not binary:
@@ -516,6 +516,8 @@ def run_once(case_path, case, spec, n, args, out_dir):
     failures = evaluate(case, t)
     if case.get("skills") and args.plugin_dir and not t.skill_loaded:
         failures.append("the skill wasn't loaded")
+    if case.get("skills") == [] and t.skill_loaded:
+        failures.append("the skill was loaded for other work")
     if case.get("drive"):
         failures += check_driving(case["drive"], t, agent)
     if timed_out:
@@ -546,6 +548,8 @@ def main():
                          "(e.g. the sources of an editable install)")
     ap.add_argument("--timeout", type=int, default=300, help="per-run timeout (s)")
     ap.add_argument("--plugin-dir", help="load the plugin from this folder, to test a skill that is not released")
+    ap.add_argument("--no-skill", action="store_true",
+                    help="run without the skill, to compare; an installed copy is turned off where the agent allows it")
     ap.add_argument("--out", help="folder for the transcripts (default: a new temporary folder)")
     ap.add_argument("--keep", action="store_true", help="keep the copy of the project of each run")
     args = ap.parse_args()
@@ -554,6 +558,10 @@ def main():
     for spec in specs:
         if spec.partition(":")[0] not in AGENTS:
             ap.error(f"unknown agent {spec}; one of {', '.join(AGENTS)}")
+    if args.no_skill and args.plugin_dir:
+        ap.error("--no-skill and --plugin-dir exclude each other")
+    if args.no_skill and any(spec.partition(":")[0] in ("codex", "opencode") for spec in specs):
+        ap.error("--no-skill only works with claude and copilot")
     if args.jobs > 1 and args.sandbox != "whole":
         ap.error("--jobs needs --sandbox whole: outside of it `session list` shows the sessions of the other runs")
     if args.sandbox == "whole" and not shutil.which("bwrap"):

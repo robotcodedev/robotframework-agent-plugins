@@ -1,0 +1,25 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "a line breakpoint with the file name alone",
+  "drive": "debug",
+  "query": "Stop at line 25 of login.robot in the 'Login Works' test and tell me what ${response} is there.",
+  "files": [
+    "demo-project — the file is tests/login.robot, and the query names only login.robot"
+  ],
+  "expected_behavior": [
+    "Sets the breakpoint with `login.robot:25` or `tests/login.robot:25`, scoped to the test",
+    "Stops there and reports the value of ${response}"
+  ],
+  "must_run": [
+    "--break[ =]\\S*login\\.robot:25\\b"
+  ],
+  "must_not_run": [],
+  "must_not_create": [
+    "\\.robot$"
+  ],
+  "must_answer": [
+    "invalid credentials"
+  ]
+}

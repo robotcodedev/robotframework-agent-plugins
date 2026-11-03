@@ -1,0 +1,23 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "configuration — a new profile, and a check that applies it",
+  "query": "Add a profile nightly to robot.toml that runs only the smoke tests and writes to results/nightly, and check that it takes effect.",
+  "files": [
+    "demo-project — robot.toml has a profile `ci`"
+  ],
+  "expected_behavior": [
+    "Reads the settings with `robotcode config info desc`, or from config.md",
+    "Checks with `robotcode -p nightly profiles show`, `--dry` or `discover`, which apply the profile, not with `config show`",
+    "Reports the output directory and the tag in effect"
+  ],
+  "must_run": [
+    "robotcode\\b[^\\n]*(-p|--profile)[ =]nightly\\b(?![^\\n]*\\bconfig\\s+show\\b)"
+  ],
+  "must_not_run": [],
+  "must_not_create": [],
+  "must_answer": [
+    "nightly"
+  ]
+}

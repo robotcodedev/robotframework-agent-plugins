@@ -1,0 +1,17 @@
+{
+  "skills": [],
+  "focus": "the skill stays out of work that has nothing to do with Robot Framework",
+  "query": "How many lines does README.md have?",
+  "files": [
+    "demo-project"
+  ],
+  "expected_behavior": [
+    "Answers without loading the skill"
+  ],
+  "must_run": [],
+  "must_not_run": [],
+  "must_not_create": [],
+  "must_answer": [
+    "\\b\\d+\\b"
+  ]
+}

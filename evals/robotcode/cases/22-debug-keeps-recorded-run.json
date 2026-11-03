@@ -1,0 +1,29 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "a debug run replaces the output of the last run — keep it when it is still needed",
+  "drive": "debug",
+  "query": "Step through the 'Login Works' test to see what ${response} is at line 25 of tests/login.robot. Then tell me how many tests the last full run had and how many of them failed.",
+  "files": [
+    "demo-project; `setup.sh` leaves a finished run with 5 tests in results/output.xml"
+  ],
+  "expected_behavior": [
+    "Debugs the test with `--output NONE --log NONE --report NONE`, or reads the recorded run first and then doesn't overwrite it",
+    "Reports the value of ${response}",
+    "Reports 5 tests of the full run and 1 failure, not the one test it debugged"
+  ],
+  "must_run": [
+    "(session start debug|robot-debug)\\b[^\\n]*--output[ =]NONE"
+  ],
+  "must_not_run": [
+    "\\bcat\\b[^|;&\\n]*output\\.xml"
+  ],
+  "must_not_create": [
+    "\\.robot$"
+  ],
+  "must_answer": [
+    "\\b5\\b",
+    "invalid credentials"
+  ]
+}

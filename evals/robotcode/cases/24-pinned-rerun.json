@@ -1,0 +1,27 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "workflow E — a run in a file of its own, and a rerun of its failures; `--output` is relative to the output directory",
+  "query": "Run all the tests and keep this run's results in a file of its own, so that later runs don't overwrite them. Then rerun only the tests that failed and tell me whether they still fail.",
+  "files": [
+    "demo-project — robot.toml sets output-dir = \"results\""
+  ],
+  "expected_behavior": [
+    "Runs with `--output <file>` without the output directory in the path, or copies the file aside",
+    "Reruns with `--rerunfailed` on that file, and into another file",
+    "Reports which tests still fail"
+  ],
+  "must_run": [
+    "--rerunfailed[ =]\\S"
+  ],
+  "must_not_run": [
+    "robotcode\\b[^|;&\\n]*\\b(robot|run)\\b[^|;&\\n]*\\s(--output|-o)[ =]results/"
+  ],
+  "must_not_create": [
+    "\\.robot$"
+  ],
+  "must_answer": [
+    "fail"
+  ]
+}

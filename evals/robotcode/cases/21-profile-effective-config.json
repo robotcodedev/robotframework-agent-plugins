@@ -1,0 +1,23 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "what is in effect under a profile — `profiles show` applies it, `config show` doesn't",
+  "query": "Which output directory does a run with our ci profile use?",
+  "files": [
+    "demo-project — robot.toml sets output-dir at the top and in the profile `ci`"
+  ],
+  "expected_behavior": [
+    "Runs `robotcode -p ci profiles show` or `robotcode -p ci --dry robot`, which apply the profile",
+    "Doesn't rely on `robotcode -p ci config show`, which ignores the profile",
+    "Answers `results/ci`"
+  ],
+  "must_run": [
+    "robotcode\\b[^\\n]*(-p|--profile)[ =]ci\\b[^\\n]*\\bprofiles\\s+show\\b|robotcode\\b[^\\n]*--dry\\b[^\\n]*(-p|--profile)[ =]ci\\b|robotcode\\b[^\\n]*(-p|--profile)[ =]ci\\b[^\\n]*--dry\\b"
+  ],
+  "must_not_run": [],
+  "must_not_create": [],
+  "must_answer": [
+    "results/ci"
+  ]
+}

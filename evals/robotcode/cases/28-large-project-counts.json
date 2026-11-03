@@ -1,0 +1,26 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "large projects — aggregate instead of enumerating",
+  "query": "This project has tens of thousands of tests. How many tests are there, and which tags do they use?",
+  "files": [
+    "demo-project, small in fact: the case checks the commands; `discover tags` ends with a count of 6 tests"
+  ],
+  "expected_behavior": [
+    "Runs `robotcode discover tags`, whose last lines give the counts",
+    "Doesn't list all tests into the conversation and doesn't grep the files"
+  ],
+  "must_run": [
+    "robotcode\\b[^\\n]*\\bdiscover\\s+tags\\b"
+  ],
+  "must_not_run": [
+    "\\b(grep|rg|ag)\\b(?![^|;&\\n]*--files)[^|;&\\n]*\\.robot",
+    "robotcode\\b[^\\n]*\\bdiscover\\s+(tests|all)\\b(?![^\\n]*\\|)"
+  ],
+  "must_not_create": [],
+  "must_answer": [
+    "\\b6\\b",
+    "smoke"
+  ]
+}

@@ -28,8 +28,17 @@ Each case targets one behavior. They're ordered **simplest first** — from "jus
 | 18 | run-one-test-by-longname | one test by its longname, not by handing over the `.robot` file |
 | 19 | global-option-before-subcommand | a profile goes before the subcommand |
 | 20 | missing-extra-asks-first | `No such command`: asks before installing the extra |
+| 21 | profile-effective-config | what is in effect under a profile comes from `profiles show`, not `config show` |
+| 22 | debug-keeps-recorded-run | a debug run doesn't replace the recorded run that is still needed |
+| 23 | debug-break-bare-file | a line breakpoint with the file name alone |
+| 24 | pinned-rerun | a run in a file of its own and a rerun of its failures |
+| 25 | tasks-discover | `discover tasks` for tasks |
+| 26 | author-a-test | a new test: static check first, then only that test |
+| 27 | config-add-profile | a new profile, checked with a command that applies it |
+| 28 | large-project-counts | counts and tags without listing all tests |
+| 29 | other-work-no-skill | the skill stays out of other work |
 
-(`02`, `03` and `12` need finished runs, which `./setup.sh` makes; the harness runs it in each copy of the fixture. `07` needs a browser library — see the [fixture README](fixtures/demo-project/README.md).)
+(`02`, `03`, `12` and `22` need finished runs, which `./setup.sh` makes; the harness runs it in each copy of the fixture. `07` needs a browser library — see the [fixture README](fixtures/demo-project/README.md).)
 
 ## How an eval is shaped
 
@@ -37,7 +46,7 @@ One JSON file per case in [`cases/`](cases/). The first three fields are the sta
 
 | Field | Meaning |
 | --- | --- |
-| `skills` | Skills that should be active (`["robotcode"]`). |
+| `skills` | Skills that should be active (`["robotcode"]`). `[]` for a case in which the skill must not load. |
 | `query` | The user request to send the agent. |
 | `files` | Fixtures the case assumes exist in the project (informational — you provide them). |
 | `expected_behavior` | Free-text rubric — **judged by you or an LLM**, not by the harness. |
@@ -51,9 +60,9 @@ One JSON file per case in [`cases/`](cases/). The first three fields are the sta
 
 All regexes are Python `re.search`, case-insensitive.
 
-## Running them — there is no official runner
+## Running them
 
-Per the best-practices guide, *"there is not currently a built-in way to run these evaluations."* Two ways to do it here:
+Claude Code has [`claude plugin eval`](https://code.claude.com/docs/en/plugin-evals), which runs a plugin's skills with and without the plugin and scores them with graders, and the skill-creator plugin can tune a `description`. Both are for Claude. The harness here runs several agents and also checks the way. Two ways to run these cases:
 
 ### 1. Manually (no setup — the "Claude A / Claude B" loop)
 
@@ -81,6 +90,9 @@ cd evals/robotcode
 
 # models answer differently each time: several runs of each, four at a time
 ./run.py --plugin-dir ../../plugins/robotcode --case 13 --agent claude:haiku --repeat 5 --jobs 4
+
+# without the skill, to compare: with claude and copilot, an installed copy is turned off for claude
+./run.py --no-skill --case 01 --agent claude:sonnet
 ```
 
 At the end it prints a table of how many runs of each case and agent passed; `1E` marks a run that couldn't start (not logged in, out of credits). Transcripts stay in the folder that `--out` names, by default a new temporary one. `--project DIR` points it at a different project. Exit code is 0 only if every run passes its checks (the rubric stays manual).
@@ -124,7 +136,7 @@ The harness only grades the objective checks. For the `expected_behavior` rubric
 
 - **Regex checks are necessary, not sufficient.** They confirm the agent reached for the right command; the rubric covers the rest (did it report counts first? step through the debugger interactively and resume? avoid hanging?).
 - **Test across models and agents.** The guide recommends Haiku, Sonnet, and Opus — a skill that works on Opus may need more guidance for Haiku. One run says little: compare several with `--repeat`.
-- **A Haiku model gets the skill named.** It hardly loads the skill by itself, so RobotCode's guide tells its users to name it, and the harness starts its prompts with *Use the robotcode skill.* Its runs say how well it follows the skill, not whether it finds it.
+- **A Haiku model gets the skill named.** It hardly loads the skill by itself, so RobotCode's guide tells its users to name it, and the harness starts its prompts with *Use the robotcode skill.* when the case expects the skill. Its runs say how well it follows the skill, not whether it finds it.
 - **The transcript of Codex hides what it writes to a running command.** It shows `robotcode repl`, not the inputs that follow, so going one input at a time can only be checked in a session.
 - **Evals are the source of truth for changes.** When you edit the skill, re-run the affected cases and compare; add a new case whenever you find a behavior the skill should enforce but doesn't.
 

@@ -9,7 +9,7 @@
     "Reports that the test fails, with the reason"
   ],
   "must_run": ["robotcode\\b[^\\n]*\\b(robot|run)\\b[^\\n]*\\s(-bl|--by-longname|-t|--test)[ =]"],
-  "must_not_run": ["robotcode\\b[^\\n]*\\b(robot|run)\\b[^\\n]*\\.robot\\b"],
+  "must_not_run": ["robotcode\\b[^|;&\\n]*\\b(robot|run)\\b[^|;&\\n]*\\.robot\\b"],
   "must_not_create": ["\\.robot$"],
   "must_answer": ["fail"]
 }

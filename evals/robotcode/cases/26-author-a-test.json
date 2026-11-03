@@ -1,0 +1,27 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "authoring — check statically, then run only what was added",
+  "query": "Add a test to tests/orders.robot that checks that submitting order 7 returns a record with the item gadget, and make sure it works.",
+  "files": [
+    "demo-project — orders.resource has `Submit Order`"
+  ],
+  "expected_behavior": [
+    "Looks the keyword up with `robotcode doc`",
+    "Runs `robotcode analyze code` on the file before running it",
+    "Runs only the new test by its longname, not the file",
+    "Reports that it passes"
+  ],
+  "must_run": [
+    "robotcode\\b[^\\n]*\\banalyze\\s+code\\b",
+    "robotcode\\b[^\\n]*\\b(robot|run)\\b[^\\n]*\\s(-bl|--by-longname|-t|--test)[ =]"
+  ],
+  "must_not_run": [
+    "robotcode\\b[^|;&\\n]*\\b(robot|run)\\b[^|;&\\n]*\\.robot\\b"
+  ],
+  "must_not_create": [],
+  "must_answer": [
+    "pass"
+  ]
+}

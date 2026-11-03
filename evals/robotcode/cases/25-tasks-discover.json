@@ -1,0 +1,30 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "RPA — `discover tasks` lists tasks, `discover tests` doesn't",
+  "prepare": [
+    "mkdir -p tasks",
+    "printf '*** Tasks ***\\nPrepare Daily Report\\n    Log    working\\n' > tasks/daily.robot"
+  ],
+  "query": "Which tasks are in the tasks folder of this project?",
+  "files": [
+    "demo-project; `prepare` adds tasks/daily.robot with one task, outside the configured `paths`"
+  ],
+  "expected_behavior": [
+    "Runs `robotcode discover tasks tasks` or `robotcode discover all tasks`",
+    "Doesn't read or grep the file",
+    "Names the task"
+  ],
+  "must_run": [
+    "robotcode\\b[^\\n]*\\bdiscover\\s+(tasks|all)\\b"
+  ],
+  "must_not_run": [
+    "\\b(grep|rg|ag)\\b(?![^|;&\\n]*--files)[^|;&\\n]*\\.robot",
+    "\\bcat\\b[^|;&\\n]*tasks/"
+  ],
+  "must_not_create": [],
+  "must_answer": [
+    "Prepare Daily Report"
+  ]
+}
