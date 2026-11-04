@@ -37,6 +37,7 @@ Each case targets one behavior. They're ordered **simplest first** — from "jus
 | 27 | config-add-profile | a new profile, checked with a command that applies it |
 | 28 | large-project-counts | counts and tags without listing all tests |
 | 29 | other-work-no-skill | the skill stays out of other work |
+| 30 | results-of-another-run | the file of another run goes with `-o` after the subcommand of `results` |
 
 (`02`, `03`, `12` and `22` need finished runs, which `./setup.sh` makes; the harness runs it in each copy of the fixture. `07` needs a browser library — see the [fixture README](fixtures/demo-project/README.md).)
 

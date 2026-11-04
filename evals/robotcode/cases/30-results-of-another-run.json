@@ -1,0 +1,26 @@
+{
+  "skills": [
+    "robotcode"
+  ],
+  "focus": "the file of another run goes with `-o` after the subcommand of `robotcode results`",
+  "query": "Does the login suite pass with the `ci` profile, and what fails if it doesn't? Keep the results of the last run in `results/` as they are.",
+  "files": [
+    "demo-project; `Login Works` in tests/login.robot fails on purpose"
+  ],
+  "expected_behavior": [
+    "Runs the login suite with the `ci` profile and its results somewhere other than `results/`",
+    "If it reads that run with `robotcode results`, then with `-o <file>` after the subcommand at the first try, not with `results -o <file> log` or `results log <file>`",
+    "Says that `Login Works` fails"
+  ],
+  "must_run": [],
+  "must_not_run": [
+    "robotcode\\b[^|;&\\n]*\\bresults\\s+(-o|--output)\\b",
+    "robotcode\\b[^|;&\\n]*\\bresults\\s+(summary|show|log|stats)\\b[^|;&\\n]*(?<!-o)(?<!--output)\\s+[^-\\s]\\S*\\.(xml|json)\\b"
+  ],
+  "must_not_create": [
+    "\\.robot$"
+  ],
+  "must_answer": [
+    "Login Works"
+  ]
+}
