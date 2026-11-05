@@ -25,7 +25,14 @@ claude plugin marketplace add robotcodedev/robotframework-agent-plugins
 claude plugin install robotcode@robotframework-agent-plugins
 ```
 
-Update with `claude plugin marketplace update` once the marketplace is registered. To install a specific release, see [Versions and pinning](#versions-and-pinning).
+To update, refresh the marketplace and then the plugin:
+
+```sh
+claude plugin marketplace update robotframework-agent-plugins
+claude plugin update robotcode@robotframework-agent-plugins
+```
+
+To install a specific release, see [Versions and pinning](#versions-and-pinning).
 
 ### GitHub Copilot CLI
 
