@@ -101,7 +101,7 @@ Contributions are reviewed on their technical merit, usefulness to users, and co
 A good bug report shouldn't leave others needing to chase you up for more information. Please complete the following steps in advance to help us fix any potential bug as fast as possible.
 
 - Make sure that you are using the latest version of the plugin and your agent.
-- Determine if your bug is really a bug and not an error on your side — for instance, whether your agent currently [supports the Open Plugin spec](https://open-plugins.com/supported-agents), or whether the underlying tool the plugin drives (e.g. `robotcode`) is installed and working.
+- Determine if your bug is really a bug and not an error on your side — for instance, whether your agent is one of those in the [marketplace README](README.md#install-per-agent) or [supports Agent Plugins](https://agent-plugins.org/compatible-clients), or whether the underlying tool the plugin drives (e.g. `robotcode`) is installed and working.
 - To see if other users have experienced (and potentially already solved) the same issue, check the [issue tracker](https://github.com/robotcodedev/robotframework-agent-plugins/issues).
 - Collect information about the bug:
   - The agent and version (Claude Code, Copilot CLI, Copilot Chat, Codex, …).
@@ -173,7 +173,7 @@ See [Repository layout](README.md#repository-layout) in the README for how the s
 
 Add your plugin under `plugins/<your-plugin>/` with at minimum:
 
-- `.plugin/plugin.json` — [Open Plugins spec](https://open-plugins.com/plugin-builders/specification) manifest, with `"license": "Apache-2.0"`.
+- `plugin.json` — [Agent Plugins manifest](https://agent-plugins.org/plugin-authors/manifest), with `$schema` set to `https://agent-plugins.org/schemas/1.0.0/plugin.schema.json` and `"license": "Apache-2.0"`. Skills go into `skills/<skill>/SKILL.md`.
 - A skill, agent, hook, or MCP/LSP config — whatever the plugin provides.
 - A `README.md` describing what it does, prerequisites, and how the agent activates it.
 - A `LICENSE` file (Apache-2.0 — copy the one at the [repo root](LICENSE)) so the plugin stays self-contained when an agent caches it independently of this marketplace.
@@ -186,7 +186,7 @@ Use the existing [`plugins/robotcode/`](plugins/robotcode/) plugin as a referenc
 - **`main`** holds the released state. Agents install from it when no ref is given, so it only moves forward when a release is published.
 - **Tags** named `<plugin>--v<version>`, for example `robotcode--v2.8.0`, mark each release of a plugin. Users pin to these tags to install a specific release (see [Versions and pinning](README.md#versions-and-pinning)).
 
-Every plugin sets `version` in its `.plugin/plugin.json`, following [Semantic Versioning](https://semver.org/).
+Every plugin sets `version` in its `plugin.json`, following [Semantic Versioning](https://semver.org/).
 
 The `robotcode` plugin is tied to the `robotcode` CLI: its `version` is always the `robotcode` release it describes, and `metadata.version` in its `SKILL.md` carries the same value. Don't change either in a pull request; maintainers set them when `robotcode` is released.
 
@@ -195,7 +195,7 @@ The `robotcode` plugin is tied to the `robotcode` CLI: its `version` is always t
 
 This is a maintainer task. The plugin is released together with `robotcode`: the `robotcode` repository bundles a copy of the plugin and records the commit it was synced from in `chat-plugins/.upstream.json`. That commit becomes the release. Release every `robotcode` version this way, including patch releases without skill changes, so that each `robotcode` release has a matching tag.
 
-1. On `next`, set `version` in `plugins/robotcode/.plugin/plugin.json` and `metadata.version` in `plugins/robotcode/skills/robotcode/SKILL.md` to the new `robotcode` version, run `python scripts/sync_manifests.py`, then commit and push `next`.
+1. On `next`, set `version` in `plugins/robotcode/plugin.json` and `metadata.version` in `plugins/robotcode/skills/robotcode/SKILL.md` to the new `robotcode` version, run `python scripts/sync_manifests.py`, then commit and push `next`.
 2. In the `robotcode` repository, sync the plugin with `hatch run build:sync-chat-plugin`, commit the result, and run `hatch run build:bump`. Before it commits, the bump checks that the plugin has the new version, matches this repository and was synced from a commit on `next`; after it, it tags that commit here as `robotcode--vX.Y.Z` and moves the local `main` to it, without pushing (this checkout must be next to the `robotcode` checkout).
 3. Push this repository together with the `robotcode` release, as the bump prints:
    ```sh
@@ -212,15 +212,15 @@ This is a maintainer task. The plugin is released together with `robotcode`: the
 
 #### Registering and Generating Manifests
 
-The marketplace and plugin manifests are duplicated at tool-specific paths because each agent reads only its own location. You edit the **source** manifests; a script generates the rest — never hand-edit a generated file.
+The marketplace catalog is duplicated at tool-specific paths because each agent reads only its own location, and each plugin's `plugin.json` has legacy copies in `.plugin/` and `.codex-plugin/` for agent versions that don't read it yet. You edit the **source** manifests, the catalog and each `plugin.json`; a script generates the rest — never hand-edit a generated file.
 
-1. Register the plugin once in the **source** marketplace catalog [`.plugin/marketplace.json`](.plugin/marketplace.json) (Open Plugins schema).
+1. Register the plugin once in the **source** marketplace catalog [`.plugin/marketplace.json`](.plugin/marketplace.json).
 2. If your plugin needs a Codex category other than the default, add it to `CODEX_PLUGIN_CATEGORIES` in [`scripts/sync_manifests.py`](scripts/sync_manifests.py).
-3. Run the manifest generator to populate the Claude and Codex copies:
+3. Run the manifest generator to write the copies:
    ```sh
    python scripts/sync_manifests.py
    ```
-   This writes `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`, and each `plugins/<name>/.codex-plugin/plugin.json`.
+   This writes `.claude-plugin/marketplace.json`, `.agents/plugins/marketplace.json`, and each plugin's `.plugin/plugin.json` and `.codex-plugin/plugin.json`.
 4. Verify nothing drifted before you push:
    ```sh
    python scripts/sync_manifests.py --check
@@ -244,7 +244,7 @@ Before submitting your pull request, make sure that:
 
 - [ ] The PR targets the **`next`** branch (see [Branches, Versions, and Releases](#branches-versions-and-releases)).
 - [ ] The change is **focused** on a single concern (no unrelated edits or formatting noise).
-- [ ] Each plugin still has its required files — [`.plugin/plugin.json`](README.md#repository-layout), `README.md`, and a `LICENSE` (Apache-2.0).
+- [ ] Each plugin still has its required files — [`plugin.json`](README.md#repository-layout), `README.md`, and a `LICENSE` (Apache-2.0).
 - [ ] **Generated manifests are in sync** — you ran `python scripts/sync_manifests.py` and `python scripts/sync_manifests.py --check` passes. Generated files were regenerated by the script, not edited by hand.
 - [ ] **Behavior was checked** — for skill changes, the relevant [evals](#testing-and-evaluating-your-plugin) were run (and a new case added if appropriate).
 - [ ] **Documentation** was updated where relevant (plugin README, marketplace README).

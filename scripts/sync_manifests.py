@@ -2,13 +2,16 @@
 """Sync marketplace and plugin manifests across tool-specific paths.
 
 Sources of truth (edit these):
-- .plugin/marketplace.json                    Open Plugins catalog manifest.
-- plugins/<name>/.plugin/plugin.json          Open Plugins per-plugin manifest.
+- .plugin/marketplace.json                    Marketplace catalog.
+- plugins/<name>/plugin.json                  Agent Plugins manifest (https://agent-plugins.org), with `$schema`.
 
 Generated (do not edit by hand — re-run this script):
 - .claude-plugin/marketplace.json             Byte-identical copy for Claude Code.
 - .agents/plugins/marketplace.json            Codex catalog (different schema).
-- plugins/<name>/.codex-plugin/plugin.json    Byte-identical copy for Codex.
+- plugins/<name>/.plugin/plugin.json          Legacy Open Plugins copy, without `$schema`.
+- plugins/<name>/.codex-plugin/plugin.json    Legacy Codex copy, without `$schema`.
+
+The legacy copies are for agent versions that don't read the root manifest yet.
 
 Usage:
     python scripts/sync_manifests.py            # apply (writes generated files)
@@ -25,6 +28,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 SOURCE_MARKETPLACE = REPO_ROOT / ".plugin" / "marketplace.json"
 CLAUDE_MARKETPLACE = REPO_ROOT / ".claude-plugin" / "marketplace.json"
 CODEX_MARKETPLACE = REPO_ROOT / ".agents" / "plugins" / "marketplace.json"
+
+AGENT_PLUGINS_SCHEMA = "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json"
 
 # Codex catalog defaults. When adding a plugin, register its category here so
 # the Codex listing has the right label; otherwise CODEX_DEFAULT_CATEGORY wins.
@@ -93,11 +98,15 @@ def main() -> int:
 
     for entry in source_data["plugins"]:
         pdir = plugin_dir(entry["source"])
-        src_plugin = pdir / ".plugin" / "plugin.json"
-        codex_plugin = pdir / ".codex-plugin" / "plugin.json"
+        src_plugin = pdir / "plugin.json"
         if not src_plugin.is_file():
             die(f"missing source: {src_plugin.relative_to(REPO_ROOT)}")
-        targets[codex_plugin] = src_plugin.read_text()
+        manifest = json.loads(src_plugin.read_text())
+        if "$schema" not in manifest:
+            die(f"{src_plugin.relative_to(REPO_ROOT)} has no `$schema`: set it to {AGENT_PLUGINS_SCHEMA}")
+        legacy = dump_json({key: value for key, value in manifest.items() if key != "$schema"})
+        targets[pdir / ".plugin" / "plugin.json"] = legacy
+        targets[pdir / ".codex-plugin" / "plugin.json"] = legacy
 
     drift: list[Path] = []
     for path, content in targets.items():

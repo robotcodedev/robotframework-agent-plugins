@@ -1,6 +1,6 @@
 # robotframework-agent-plugins
 
-A curated [Open Plugins](https://open-plugins.com/) marketplace for Robot Framework — Skills (and more plugin components over time) that extend AI coding agents like Claude Code, GitHub Copilot, and Codex with Robot Framework expertise.
+A curated marketplace of [Agent Plugins](https://agent-plugins.org/) for Robot Framework — Skills (and more plugin components over time) that extend AI coding agents like Claude Code, GitHub Copilot, and Codex with Robot Framework expertise.
 
 ## Plugins in this marketplace
 
@@ -12,9 +12,9 @@ More plugins are planned — Browser Library, RequestsLibrary, and general Robot
 
 ## Before you install
 
-Plugins from this marketplace follow the [Open Plugin Specification](https://open-plugins.com/plugin-builders/specification). Check whether your agent currently supports the spec at <https://open-plugins.com/supported-agents>. If it doesn't, the marketplace files in this repo will not be discovered — even if the plugin contents themselves would work standalone.
+Plugins from this marketplace follow the [Agent Plugins specification](https://agent-plugins.org/specification): each has a `plugin.json` with `$schema` in its folder and its skills under `skills/`. The [compatible clients](https://agent-plugins.org/compatible-clients) page lists the agents that support it. Claude Code isn't on that list, but it installs the plugins from this repository's marketplace file for Claude Code.
 
-Every agent uses its own command surface to add a marketplace and install a plugin. Pick the section for your agent below.
+The specification covers the plugin, not how it is installed. Every agent has its own marketplace file and its own commands to add a marketplace and install a plugin, and this repository has the marketplace files of the agents below. Pick the section for your agent.
 
 ## Install per agent
 
@@ -67,9 +67,9 @@ codex plugin add robotcode@robotframework-agent-plugins
 
 See [Codex plugin docs](https://developers.openai.com/codex/plugins).
 
-### Other Open-Plugins-compliant agents
+### Other agents
 
-If your agent implements the Open Plugin spec but isn't listed above, the install pattern is usually the same shape:
+An agent that supports Agent Plugins can load a plugin folder such as [`plugins/robotcode/`](plugins/robotcode/) as it is, but how it installs one differs: from a marketplace, a Git repository or a local folder. For agents with plugin marketplaces, the pattern is usually the same:
 
 1. Register the marketplace by repository — `<tool> plugin marketplace add robotcodedev/robotframework-agent-plugins` (or via the agent's settings / UI).
 2. Install an individual plugin — `<tool> plugin install <plugin>@robotframework-agent-plugins`.
@@ -96,29 +96,31 @@ To try unreleased changes, pin to `next` the same way.
 ## Repository layout
 
 ```
-.plugin/marketplace.json          ← Open Plugins spec marketplace manifest
+.plugin/marketplace.json          ← marketplace catalog (source)
 .claude-plugin/marketplace.json   ← Claude Code copy (same schema, tool-specific path)
 .agents/plugins/marketplace.json  ← Codex copy (different schema, tool-specific path)
 plugins/
 └── robotcode/
-    ├── .plugin/plugin.json       ← Open Plugins manifest
-    ├── .codex-plugin/plugin.json ← Codex copy (same data, tool-specific path)
+    ├── plugin.json               ← Agent Plugins manifest with $schema (source)
+    ├── .plugin/plugin.json       ← legacy Open Plugins copy, without $schema
+    ├── .codex-plugin/plugin.json ← legacy Codex copy, without $schema
     └── skills/robotcode/
         ├── SKILL.md
         └── references/
 ```
 
-Each plugin is its own directory under `plugins/`. The marketplace manifest and per-plugin manifest are duplicated at tool-specific paths because each agent reads only its own location:
+Each plugin is its own directory under `plugins/`. Its `plugin.json` follows the [Agent Plugins manifest](https://agent-plugins.org/plugin-authors/manifest), and the agents below read it first. The legacy copies in `.plugin/` and `.codex-plugin/` are for agent versions that don't read it yet, such as VS Code before 1.131, and will be dropped later. The marketplace catalog is duplicated at tool-specific paths because each agent reads only its own location:
 
-| Tool | Marketplace path | Plugin manifest path | Schema |
-| --- | --- | --- | --- |
-| Open Plugins (Copilot CLI, …) | `.plugin/marketplace.json` | `<plugin>/.plugin/plugin.json` | Open Plugins spec |
-| Claude Code | `.claude-plugin/marketplace.json` | `<plugin>/.claude-plugin/plugin.json` (if present, else `.plugin/`) | same as Open Plugins |
-| Codex | `.agents/plugins/marketplace.json` | `<plugin>/.codex-plugin/plugin.json` | Codex-specific (`source` object, `policy`, `category`, `interface`) |
+| Tool | Marketplace path | Plugin manifest it reads |
+| --- | --- | --- |
+| Claude Code | `.claude-plugin/marketplace.json` | `<plugin>/plugin.json` |
+| GitHub Copilot CLI | `.plugin/marketplace.json` | `<plugin>/plugin.json`, else `<plugin>/.plugin/plugin.json` |
+| GitHub Copilot Chat (VS Code) | `.plugin/marketplace.json` of the repository in `chat.plugins.marketplaces` | `<plugin>/plugin.json` from VS Code 1.131 on, `<plugin>/.plugin/plugin.json` before |
+| Codex | `.agents/plugins/marketplace.json` (Codex-specific schema: `source` object, `policy`, `category`, `interface`) | `<plugin>/plugin.json`, else `<plugin>/.codex-plugin/plugin.json` |
 
 ## Contributing
 
-Contributions are welcome — new plugins, improvements to existing ones, bug reports, and docs. In short, to submit a plugin: add it under `plugins/<your-plugin>/` (with `.plugin/plugin.json`, a `README.md`, and a `LICENSE`), register it in the source catalog [`.plugin/marketplace.json`](.plugin/marketplace.json), run `python scripts/sync_manifests.py` to generate the tool-specific copies, and open a PR.
+Contributions are welcome — new plugins, improvements to existing ones, bug reports, and docs. In short, to submit a plugin: add it under `plugins/<your-plugin>/` (with `plugin.json`, a `README.md`, and a `LICENSE`), register it in the source catalog [`.plugin/marketplace.json`](.plugin/marketplace.json), run `python scripts/sync_manifests.py` to generate the tool-specific copies, and open a PR.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide — plugin requirements, manifest generation, evals, commit conventions, and signed-commit setup. By participating you agree to abide by our [Code of Conduct](CODE_OF_CONDUCT.md).
 
