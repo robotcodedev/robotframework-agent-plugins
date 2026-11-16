@@ -22,7 +22,7 @@ Each case targets one behavior. They're ordered **simplest first** — from "jus
 | 12 | results-search-value | `results log --search` for whether a value occurred, not grep on `output.xml` |
 | 13 | repl-try-a-keyword | a plain "try it out" goes to the REPL, not to a throwaway test or a fixed list of inputs |
 | 14 | repl-block | a `FOR` block goes in as a whole, with its `END` |
-| 15 | debug-session-started-earlier | finds a session that is already open, reads its result and restarts it |
+| 15 | debug-session-started-earlier | takes over a session that waits at a stop, instead of starting a new one |
 | 16 | debug-second-breakpoint | the whole suite under the debugger, with a breakpoint set during the run |
 | 17 | session-in-own-sandbox | where each command has a sandbox of its own, the agent stays inside it and says what it could do |
 | 18 | run-one-test-by-longname | one test by its longname, not by handing over the `.robot` file |
